@@ -124,6 +124,7 @@ body{background:linear-gradient(160deg,#5c2e0e,#8a4a1c 60%,#a85d25)}
 #tut-box .dots{margin:4px 0;letter-spacing:4px;color:#e0b84a}
 #tut-box button{font:inherit;font-size:14px;margin:4px 3px 0;padding:5px 12px;border-radius:10px;border:2px solid #ffd8a8;background:#fff;cursor:pointer}
 @media (max-width:520px),(max-height:500px){#tut-box{font-size:12px;padding:4px 8px;top:16%}#tut-box b.tt{font-size:14px}}
+.cpurow{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:13px;color:#8a6f48}.cpurow .seg{flex:1}.cpurow .seg button{font-size:13px;padding:4px 2px}
 .tutbtn{display:block;width:100%;margin:2px 0 6px;padding:7px;border:2px dashed #e0b84a;border-radius:12px;background:#fff8e1;font:inherit;font-size:15px;color:#8a6d3b;cursor:pointer}
 .modeseg{display:flex;margin:4px 0 0}.modeseg button{flex:1;font-size:17px;padding:8px 4px}
 .row.mini4{flex-wrap:wrap}.row.mini4 .btn{flex:1 1 22%;font-size:14px;padding:8px 4px;margin:4px 0;min-width:0;white-space:nowrap}
@@ -227,7 +228,8 @@ table.keys td,table.keys th{white-space:nowrap}
   <div class="note" id="mode-note" style="margin:2px 0 6px"></div>
   <button class="tutbtn" data-act="tut">🎓 처음이면 여기부터! 1분 연습하기</button>
   <button class="btn" data-act="cont" id="btn-continue" style="display:none;background:#ffd66b;box-shadow:0 5px 0 #d9a92b"></button>
-  <button class="btn" data-act="cpu">🤖 컴퓨터와 대전</button>
+  <button class="btn" data-act="cpu" style="margin-bottom:2px">🤖 컴퓨터와 대전</button>
+  <div class="cpurow"><span>컴퓨터 실력</span><div class="seg" data-set="cpu"><button data-v="veasy">아주 쉬움</button><button data-v="easy">쉬움</button><button data-v="normal">보통</button><button data-v="hard">어려움</button></div></div>
   <button class="btn blue" data-act="local">👥 둘이서 (한 기기)</button>
   <button class="btn green" data-act="online">🌐 온라인 대전</button>
   <div class="row2"><button class="btn" data-act="team" id="btn-team" style="background:#63e6be;box-shadow:0 5px 0 #2f9e7a">⚾ 우리 팀</button><button class="btn" data-act="settings" id="btn-settings" style="background:#ffe8a3;box-shadow:0 5px 0 #e0b84a">⚙️ 경기 설정</button></div>
@@ -252,7 +254,7 @@ table.keys td,table.keys th{white-space:nowrap}
     &nbsp;&nbsp;&nbsp;&nbsp;타이밍이 빠르면 왼쪽, 늦으면 오른쪽으로 날아가요 · 원 아래쪽으로 맞히면 뜬공, 위쪽이면 땅볼<br>
     🖱 마우스도 돼요: 화면을 따라 원·조준점이 움직이고, 누르면 스윙·던지기 · 📱 <b>휴대폰</b>: 화면을 손가락으로 문지르면 원·조준점이 따라 움직이고, 톡 치면 스윙·던지기 (수비는 달려갈 곳을 눌러요)<br>
     🔄 <b>선수 교체</b>: 투수가 던지기 전에 화면 위 <b>🔄 교체</b> 버튼 → 대타(지금 타자) · 대주자(루에 있는 주자) · 대수비(수비 자리). 벤치 선수 3명은 팀·타순 메뉴에서 정해요 (🧤수비왕은 수비 범위가 넓어요)<br>
-    🤏 <b>작전</b>: 투구 전에 타자가 결정 버튼을 누르면 강공 → 번트 → 도루로 바뀌어요 (번트는 원을 공에 대기만 하면 돼요, 도루는 주자가 있을 때)<br>
+    🤏 <b>작전</b>: 투구 전에 타자가 숫자 <kbd>1</kbd>~<kbd>7</kbd>이나 위쪽 작전 카드로 바로 골라요 (결정 버튼을 누르면 강공 → 번트 → 도루 … 차례로 바뀌어요) (번트는 원을 공에 대기만 하면 돼요, 도루는 주자가 있을 때)<br>
     🏃 깊은 뜬공이면 3루 주자가 홈으로(희생 플라이), 땅볼 때도 주자가 한 베이스씩 가요 · 1루에 주자가 있을 때 땅볼이면 <b>병살</b>, 운이 나쁘면 <b>삼중살</b>!<br>
     ⚾ <b>팀·로고·타순</b> 메뉴에서 팀 이름·로고와 9명 타순(🔥강타자 🎯교타자 💨준족)을 정할 수 있어요 · <b>타격 난이도</b>를 쉬움으로 하면 잘 맞아요<br>
     🫲 <b>좌우</b>: 타자는 우타·좌타·양타, 투수는 우투·좌투 (팀·타순 메뉴) · 같은 손끼리면 치기 조금 어렵고, 좌타는 당겨 치면 오른쪽으로 날아가요<br>
@@ -267,7 +269,7 @@ table.keys td,table.keys th{white-space:nowrap}
     👔 팀·타순 메뉴에서 <b>감독 이름</b>, <b>팀 색</b>(로고·모자), <b>투수진</b>(선발 + 불펜 4명 이름·손)도 정해요 · 특별한 선수는 팀마다 🔥강타자·🎯교타자·💨준족 3명, 🧤수비왕 2명까지 (벤치 포함)<br>
     📺 <b>비디오 판독</b>: 도루·견제·1루 승부가 아슬아슬하면 화면에 <b>📺 비디오 판독 요청</b> 버튼이 떠요 (팀마다 경기당 2번) · 판정이 틀렸으면 번복!<br>
     🧤 <b>포수 타이밍</b>: 주자가 있으면 수비 쪽에 파란 고리가 줄어들어요. 공이 미트에 들어오는 순간 결정 버튼! → 원바운드는 <b>블로킹</b>(폭투가 확 줄어요), 주자가 뛰면 <b>빠른 송구</b>(도루 저지↑) · <b>피치아웃</b>: 타자 바깥으로 쭉 빼는 공 — 볼이 되지만 도루하던 주자를 거의 잡아요<br>
-    🏃 <b>작전</b> (타자 결정 버튼으로 바꾸기): 강공 → 번트 → 도루 → 런앤히트(주자가 먼저 뛰고 좋은 공만 쳐요) → 히트앤런(주자가 뛰니 타자는 무조건 휘둘러야 해요, 헛스윙해도 포수를 가려 줘요) → 더블스틸(1·2루, 1·3루) → 홈스틸(3루 주자)<br>
+    🏃 <b>작전</b> (타자: 숫자 <kbd>1</kbd>~<kbd>7</kbd>이나 위쪽 작전 카드로 바로 고르기, 둘이서는 2P가 숫자패드 · 결정 버튼을 누르면 차례로 바뀌어요 · 투수는 타자가 준비할 때까지 잠깐 기다려요): 1 강공 → 2 번트 → 3 도루 → 4 런앤히트(주자가 먼저 뛰고 좋은 공만 쳐요) → 5 히트앤런(주자가 뛰니 타자는 무조건 휘둘러야 해요, 헛스윙해도 포수를 가려 줘요) → 6 더블스틸(1·2루, 1·3루) → 7 홈스틸(3루 주자)<br>
     ⚡ <b>런다운</b>: 견제에 걸린 주자는 루 사이에 갇혀요. 주자는 ←→로 도망, 수비는 결정 버튼으로 반대쪽 수비수에게 던져서 공 가진 수비수가 태그! · 🤕 <b>몸에 맞는 공</b>: 타자 몸쪽으로 너무 깊은 공을 안 치면 1루로 걸어 나가요<br>
     🙅 <b>고의 낙구</b>: 1루에 주자가 있고 2아웃 전, 내야 뜬공·직선타를 일부러 떨어뜨리면(수비 때 결정 버튼) 심판이 타자 아웃·주자 제자리로 정해요 (1·2루 내야 뜬공은 <b>인필드 플라이</b>) · ⏱ <b>피치클락</b>(설정): 주자 없을 때 15초, 있을 때 20초 안에 안 던지면 자동 볼, 견제는 타석마다 2번까지(3번째에 못 잡으면 보크) · 🏳 <b>콜드게임</b>: 9회 경기에서 5회 10점·7회 7점 차가 나면 끝나요<br>
     🤫 <b>비밀 작전</b>(설정, 둘이서·키보드): 1P 투수는 <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd>/<kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>/<kbd>Z</kbd><kbd>X</kbd><kbd>C</kbd>, 2P 투수는 <b>숫자패드</b> 1~9(코스는 789가 위 줄)로 공·코스를 몰래 골라요 · 📱 둘이서 터치하면 화면 왼쪽은 1P, 오른쪽은 2P 손가락이에요<br>
@@ -579,7 +581,7 @@ function newBatter(G) { G.balls = 0; G.strikes = 0; G.cu = 0; G.cv = 0; G.pko = 
 const pcFull = G => Math.round(G.rate * PCLOCK[G.bases.some(x => x) ? 1 : 0]);
 function nextPitch(G) {
   if (G.ptype >= NP || (G.prp && !pitchOpts(G).includes(G.ptype))) G.ptype = 0;
-  G.phase = 'select'; G.ball = null; G.swing = -1; G.swung = 0; G.tu = 0; G.tv = 0; G.lx = 0; G.ly = 0; G.res = null; G.bmode = 0;
+  G.phase = 'select'; G.ball = null; G.swing = -1; G.swung = 0; G.tu = 0; G.tv = 0; G.lx = 0; G.ly = 0; G.res = null; G.bmode = 0; G.selT = 0; G.pq = 0;
   G.pc = G.pclock ? pcFull(G) : 0; G.ct = -1;
 }
 // 주자 진루: n루타 (4 = 홈런), walk = 볼넷(밀어내기만)
@@ -1007,7 +1009,8 @@ function doCmd(G, t, c) {
 }
 function tick(G, inputs) {
   G.tick++;
-  if (G.phase === 'select') for (const t of [0, 1]) { const c = (inputs[t] || IDLE).cmd; if (c !== undefined && c >= 0) doCmd(G, t, c); }
+  if (G.phase === 'select') for (const t of [0, 1]) { const c = (inputs[t] || IDLE).cmd; if (c !== undefined && c >= 0 && c < 16) doCmd(G, t, c); }
+  if ((G.phase === 'select' || G.phase === 'aim') && !G.easy && !G.derby) { const c = (inputs[batTeam(G)] || IDLE).cmd; if (c >= 16 && c <= 22 && modeOK(G, c - 16)) G.bmode = c - 16; }   // 작전 바로 고르기 (숫자키·작전 카드)
   const pin = inputs[pitTeam(G)] || IDLE, bin = inputs[batTeam(G)] || IDLE;
   // 타자는 언제든 방망이 위치를 옮길 수 있음
   if (G.phase === 'select' || G.phase === 'aim' || G.phase === 'pitch') {
@@ -1023,11 +1026,13 @@ function tick(G, inputs) {
       }
       if (bin.hit && !G.easy) G.bmode = nextMode(G);                   // 타자: 결정 버튼으로 작전 (강공 → 번트 → 도루 …)
       if (pclockTick(G)) break;
-      if (pin.g >= 0) { const o = pitchOpts(G); if (pin.g < o.length) { G.ptype = o[pin.g]; choosePitch(G); } break; }   // 비밀 작전 모드: 키 하나로 바로 고르기
+      G.selT++; const ready = G.selT >= G.rate * 1.2;               // 타자가 준비하는 동안(1.2초)은 아직 못 던져요 (구종·수비는 미리 골라 둘 수 있음)
+      if (pin.g >= 0) { const o = pitchOpts(G); if (pin.g < o.length) { G.ptype = o[pin.g]; if (ready) { choosePitch(G); break; } G.pq = 1; } }   // 비밀 작전 모드: 키 하나로 바로 고르기
+      if (ready && G.pq) { G.pq = 0; choosePitch(G); break; }        // 미리 눌러 둔 결정은 타자가 준비되면 바로   // 비밀 작전 모드: 키 하나로 바로 고르기
       if (pin.x && pin.x !== G.lx) { const o = pitchOpts(G), i = Math.max(0, o.indexOf(G.ptype)); G.ptype = o[(i + pin.x + o.length) % o.length]; }
       if (pin.y && pin.y !== G.ly && !G.easy) { const t = pitTeam(G); G.def[t] = (G.def[t] + pin.y + DEFS.length) % DEFS.length; }
       G.lx = pin.x; G.ly = pin.y;
-      if (pin.hit) choosePitch(G);
+      if (pin.hit) { if (ready) choosePitch(G); else G.pq = 1; }
       break;
     case 'aim':                                                      // 투수: 코스 조준
       if (bin.hit && !G.easy) G.bmode = nextMode(G);
@@ -1111,10 +1116,10 @@ function tick(G, inputs) {
 const AI_LV = {
   // 투수: ctrl 조준 흔들림, waste 유인구 비율 / 타자: late 반응 지연(프레임), terr 타이밍 오차, perr 위치 오차, chase 볼에 손 나가는 정도
   // read: 변화구 꺾임을 알아채는 확률, take: 초구·유리한 카운트에서 스트라이크도 그냥 보내는 정도
-  veasy:  { ctrl: 0.35, waste: 0.1,  late: 24, terr: 6,   perr: 0.45, chase: 0.45, read: 0.2,  take: 0.15, think: 50, bunt: 0.05, steal: 0.05, sub: 0 },
+  veasy:  { ctrl: 0.45, waste: 0.1,  late: 30, terr: 8,   perr: 0.6,  chase: 0.5, read: 0.2,  take: 0.15, think: 50, bunt: 0.05, steal: 0.05, sub: 0 },
   easy:   { ctrl: 0.25, waste: 0.15, late: 18, terr: 5,   perr: 0.35, chase: 0.35, read: 0.35, take: 0.2,  think: 40, bunt: 0.08, steal: 0.08, sub: 0 },
   normal: { ctrl: 0.15, waste: 0.2,  late: 14, terr: 4,   perr: 0.28, chase: 0.28, read: 0.5,  take: 0.25, think: 32, bunt: 0.1,  steal: 0.12, sub: 0.25, ibb: 0.15, pick: 0.06 },
-  hard:   { ctrl: 0.08, waste: 0.25, late: 11, terr: 3,   perr: 0.2,  chase: 0.2,  read: 0.7,  take: 0.3,  think: 26, bunt: 0.12, steal: 0.15, sub: 0.6, ibb: 0.35, pick: 0.1 }
+  hard:   { ctrl: 0.06, waste: 0.25, late: 9,  terr: 2.5, perr: 0.15, chase: 0.18,  read: 0.7,  take: 0.3,  think: 26, bunt: 0.12, steal: 0.15, sub: 0.6, ibb: 0.35, pick: 0.1 }
 };
 function makeAI(me, lv) { return { me, lv: AI_LV[lv] || AI_LV.normal, id: -1, plan: null, bat: null, t: 0 }; }
 // 컴퓨터 선수 교체 (보통은 가끔, 어려움은 자주): 경기 막판에 대타(강타자)·대주자(준족)·대수비(수비왕)
@@ -1185,7 +1190,7 @@ function aiInput(ai, G) {
       else if (lv.ibb && !b[0] && (b[1] || b[2]) && slug && G.balls + G.strikes === 0 && G.inning >= G.innings - 1 && Math.random() < lv.ibb) type = IBB;   // 강타자는 거르기
       else if (lv.pick && (b[0] || b[1]) && !b[2] && (G.pko | 0) < 2 && Math.random() < lv.pick) type = PK;                                // 가끔 견제
       else if (lv.pick && b[0] && !b[1] && G.outs < 2 && G.balls < 2 && Math.random() < lv.pick * 0.6) type = PO;                         // 도루 낌새가 보이면 피치아웃
-      ai.plan = { type, u: cu + (Math.random() * 2 - 1) * lv.ctrl, v: cv + (Math.random() * 2 - 1) * lv.ctrl, wait: lv.think * (0.6 + Math.random() * 0.8) };
+      ai.plan = { type, u: cu + (Math.random() * 2 - 1) * lv.ctrl, v: cv + (Math.random() * 2 - 1) * lv.ctrl, wait: (G.rate * 1.5 + lv.think * 2.5) * (0.7 + Math.random() * 0.8) };   // 실제 투수처럼 사인을 주고받고 잠깐 뜸을 들여요
     }
     const P = ai.plan;
     if (ai.t < P.wait) return inp;
@@ -1305,7 +1310,7 @@ function createRollback(match, me, send, sendSync) {
       const f = m.s + i;
       if (f <= rb.upTo || rb.inp[rb.rem][f] !== undefined) continue;
       const c = d.charCodeAt(i) - 65;
-      if (!(c >= 0 && c < 34)) continue;
+      if (!(c >= 0 && c < 41)) continue;
       rb.inp[rb.rem][f] = c;
       if (f < rb.frame && rb.used[f] !== c) rb.rollFrom = Math.min(rb.rollFrom, f);
     }
@@ -1481,9 +1486,9 @@ function merge(...a) {
   for (const i of a) { x += i.x; y += i.y; hit = hit || i.hit; }
   return { x: Math.sign(x), y: Math.sign(y), hit };
 }
-function clearEdges() { hitEdge.A = hitEdge.B = hitEdge.C = hitEdge.S = false; pads[0].hitEdge = pads[1].hitEdge = false; gEdge[0] = gEdge[1] = -1; defEdge[0] = defEdge[1] = false; }
+function clearEdges() { hitEdge.A = hitEdge.B = hitEdge.C = hitEdge.S = false; pads[0].hitEdge = pads[1].hitEdge = false; gEdge[0] = gEdge[1] = -1; defEdge[0] = defEdge[1] = false; tacK[0] = tacK[1] = -1; }
 // 비밀 작전 모드 (둘이서·키보드): 투수는 9개 키로 공·코스를 바로 골라요. 고른 것은 화면에 안 보여요
-const gEdge = [-1, -1], defEdge = [false, false];
+const gEdge = [-1, -1], defEdge = [false, false], tacK = [-1, -1];   // tacK: 숫자 1~7·작전 카드로 고른 작전
 function hideOn() { return mode === 'local' && !!Settings.hide && !touchUI() && !(G && (G.easy || G.derby)); }
 function hideIn(g, i, inp) {
   const gi = gEdge[i], de = defEdge[i]; gEdge[i] = -1; defEdge[i] = false;
@@ -1511,7 +1516,9 @@ addEventListener('keydown', e => {
   if (!e.repeat) for (const s of ['A', 'B', 'C', 'S']) if (KEYSET[s].hit.includes(e.code)) hitEdge[s] = true;
   const hk = hideOn() && (HKEYS[0].includes(e.code) || HKEYS[1].includes(e.code) || HDEF_KEY.includes(e.code));
   if (hk && !e.repeat) for (const t of [0, 1]) { const gi = HKEYS[t].indexOf(e.code); if (gi >= 0) gEdge[t] = gi; if (HDEF_KEY[t] === e.code) defEdge[t] = true; }
-  if (inGame() && (GAME_CODES.has(e.code) || hk)) e.preventDefault();
+  const tm = /^(Digit|Numpad)([1-7])$/.exec(e.code), tk = !!tm && inGame() && !(G && G.derby) && mode !== 'spec';
+  if (tk && !e.repeat) tacK[mode === 'local' ? (tm[1] === 'Numpad' ? 1 : 0) : mode === 'guest' ? 1 : 0] = +tm[2] - 1;   // 둘이서: 숫자줄 = 1P, 숫자패드 = 2P
+  if (inGame() && (GAME_CODES.has(e.code) || hk || tk)) e.preventDefault();
   if ((e.code === 'Escape' || e.code === 'KeyP') && !e.repeat) togglePause();
 });
 addEventListener('keyup', e => { keys[e.code] = false; });
@@ -2075,6 +2082,9 @@ function render(v, now, dt) {
   }
 }
 // 투수 vs 타자 화면
+const TAC_X0 = 98, TAC_Y = 57, TAC_W = 38, TAC_H = 13, TAC_G = 3;
+function showTac(v) { return v && (v.phase === 'select' || v.phase === 'aim') && !v.derby && !v.easy && mode !== 'demo' && mode !== 'spec' && (mode === 'local' || myTeam(v.bat !== undefined ? v.bat : v.half)); }
+function tacAt(p) { if (p.y < TAC_Y - 2 || p.y > TAC_Y + TAC_H + 2) return -1; const m = Math.floor((p.x - TAC_X0 + TAC_G / 2) / (TAC_W + TAC_G)); return m >= 0 && m < 7 ? m : -1; }
 function drawDuel(v, now) {
   const pit = v.pit, bat = v.bat, bl = v.ball;
   // 투수
@@ -2198,6 +2208,19 @@ function drawDuel(v, now) {
     ctx.beginPath(); ctx.roundRect ? ctx.roundRect(146, 168, 70, 16, 6) : ctx.rect(146, 168, 70, 16); ctx.fill();
     outlined(started && v.bmode >= 2 ? (v.bmode === 6 ? '🏠 3루 주자 홈으로!' : '🏃 주자 스타트!') : BM_TXT[v.bmode], 181, 176.5, 8.5, '#111', '#fff');
   }
+  // 작전 카드 (위쪽 한 줄): 숫자 1~7 키나 톡으로 바로 골라요
+  if (showTac(v)) {
+    const TL = ['강공', '번트', '도루', '런앤히트', '히트앤런', '더블스틸', '홈스틸'], secret = hid && !peek;
+    for (let m = 0; m < 7; m++) {
+      const x = TAC_X0 + m * (TAC_W + TAC_G), ok = modeOK(v, m), cur = !secret && v.bmode === m;
+      ctx.globalAlpha = ok ? 1 : 0.35;
+      ctx.fillStyle = cur ? (m === 1 ? '#ffd43b' : m >= 2 ? '#63e6be' : '#fff') : 'rgba(15,20,35,.78)';
+      ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, TAC_Y, TAC_W, TAC_H, 5) : ctx.rect(x, TAC_Y, TAC_W, TAC_H); ctx.fill();
+      if (cur) { ctx.strokeStyle = '#111'; ctx.lineWidth = 1; ctx.stroke(); }
+      outlined(`${m + 1} ${TL[m]}`, x + TAC_W / 2, TAC_Y + TAC_H / 2 + 0.5, m >= 3 && m <= 5 ? 6.3 : 7, cur ? '#111' : '#fff', cur ? '#fff' : '#111');
+    }
+    ctx.globalAlpha = 1;
+  }
   // 수비 위치 (왼쪽): 투수가 고르는 중이면 목록, 아니면 지금 수비 + 작은 지도
   {
     const me = (myTeam(pit) && mode !== 'demo') || mode === 'local', dsel = v.def[pit];
@@ -2240,7 +2263,7 @@ function drawDuel(v, now) {
   else if (v.tut) msg = '';
   else if (v.derby) msg = v.phase === 'pitch' ? `🏏 ${Names[bat]}: ${mv(bat)}로 노란 원을 공에 맞추고 ${hk(bat)} 스윙!` : `💥 ${Names[bat]} · 남은 공 ${v.dleft[bat]}개 · 홈런 ${v.score[bat]}개 — 공이 곧 와요!`;
   else if ((v.phase === 'select' || v.phase === 'aim') && myTeam(bat) && mode !== 'local' && v.easy) msg = `🏏 ${mv(bat)}로 노란 원을 미리 옮겨 두세요 · 공이 오면 ${hk(bat)} 스윙!`;
-  else if ((v.phase === 'select' || v.phase === 'aim') && myTeam(bat) && mode !== 'local') msg = `🏏 ${hk(bat)}로 작전 바꾸기 (지금: ${BMODES[v.bmode]}) · ${mv(bat)}로 노란 원 미리 옮기기`;
+  else if ((v.phase === 'select' || v.phase === 'aim') && myTeam(bat) && mode !== 'local') msg = `🏏 숫자 1~7(또는 ${hk(bat)})로 작전 고르기 (지금: ${BMODES[v.bmode]}) · ${mv(bat)}로 노란 원 미리 옮기기`;
   else if (v.phase === 'select' && v.easy) msg = myTeam(pit) ? `⚾ ${Names[pit]}: ${touchUI() ? '◀ ▶ 또는 카드' : mode === 'local' ? (pit === 0 ? 'A D' : '← →') : '← →'}로 공 고르기 → ${hk(pit)} 결정` : `${Names[pit]} 투수가 공을 고르는 중…`;
   else if ((v.phase === 'select' || v.phase === 'aim') && mode === 'local' && hideOn() && !v.easy) msg = `🤫 ${Names[pit]} 투수: ${v.phase === 'select' ? `카드 옆 키(${HKEY_TXT[pit]})로 몰래 공 고르기 · ${HDEF_LBL[pit]} 수비 위치` : `${HKEY_TXT[pit]} 9칸 중 한 곳을 누르면 바로 던져요${pit ? ' (7 8 9가 위 줄)' : ''}`}`;
   else if (v.phase === 'select') msg = myTeam(pit) ? `⚾ ${Names[pit]}: ${touchUI() ? '◀ ▶' : mode === 'local' ? (pit === 0 ? 'A D' : '← →') : '← →'} 구종 · ${touchUI() ? '▲ ▼' : mode === 'local' ? (pit === 0 ? 'W S' : '↑ ↓') : '↑ ↓'} 수비 위치 → ${hk(pit)} 결정` : `${Names[pit]} 투수가 구종을 고르는 중…`;
@@ -2248,7 +2271,7 @@ function drawDuel(v, now) {
   else if (v.phase === 'pitch' && myTeam(pit) && !myTeam(bat) && v.bases.some(x => x) && !v.easy) msg = `🧤 ${Names[pit]}: 공이 미트에 들어올 때 ${hk(pit)}! (블로킹 · 도루 저지)`;
   else if (v.phase === 'pitch') msg = myTeam(bat) ? (v.bmode === 1 ? `🤏 번트: ${mv(bat)}로 노란 원을 공에 대기만 하면 돼요` : `🏏 ${Names[bat]} 타자: ${mv(bat)}로 노란 원을 공에 맞추고 ${hk(bat)} 스윙!`) : '';
   if (msg) outlined(msg, HALF, 292, 8.5, '#fff', '#111');
-  if (mode === 'local' && !v.derby && !v.easy && (v.phase === 'select' || v.phase === 'aim')) outlined(`🏏 ${Names[bat]}: ${hk(bat)} 작전 바꾸기 (지금: ${hideOn() && !peek ? '🤫' : BMODES[v.bmode]}) · ${mv(bat)} 노란 원 옮기기`, HALF, 280, 7.5, '#ffe066', '#111');
+  if (mode === 'local' && !v.derby && !v.easy && (v.phase === 'select' || v.phase === 'aim')) outlined(`🏏 ${Names[bat]}: ${bat ? '숫자패드' : '숫자'} 1~7 작전 고르기 (지금: ${hideOn() && !peek ? '🤫' : BMODES[v.bmode]}) · ${mv(bat)} 노란 원 옮기기`, HALF, 280, 7.5, '#ffe066', '#111');
   if (mode === 'local' && !v.derby && !v.easy && v.phase === 'pitch' && v.bases.some(x => x)) outlined(`🧤 ${Names[pit]}: 공이 미트에 들어올 때 ${hk(pit)} (블로킹 · 도루 저지)`, HALF, 280, 7.5, '#a5d8ff', '#111');
 }
 // 타구가 날아가는 화면 (위에서 본 경기장)
@@ -2393,7 +2416,7 @@ function startDemo() {
 }
 function setSkins(n) { Skins = Settings.skins.slice(0, 2); Names = [teamName(0), teamName(1)]; Logos = [Settings.logo0 | 0, Settings.logo1 | 0]; PNames = [Settings.pn0.slice(), Settings.pn1.slice()]; BNames = [Settings.bpn0.slice(), Settings.bpn1.slice()]; PCol = [Settings.pcol0.slice(), Settings.pcol1.slice()]; PNum = [Settings.pnum0.slice(), Settings.pnum1.slice()]; Mgrs = [String(Settings.mgr0 || ''), String(Settings.mgr1 || '')]; LStyles = [Settings.lsty0 | 0, Settings.lsty1 | 0]; PitNames = [Settings.ppn0.slice(), Settings.ppn1.slice()]; PCer = [Settings.cer0.slice(), Settings.cer1.slice()]; PSong = [Settings.sng0.slice(), Settings.sng1.slice()]; applyCols(Settings.tcol0, Settings.tcol1); }
 let PNames = [[], []], BNames = [[], []];
-const gameOpt = kind => ({ lu0: luEncode(Settings.lu0), lu1: luEncode(Settings.lu1), bn0: luEncode(Settings.bn0), bn1: luEncode(Settings.bn1), diff0: Settings.bdiff, diff1: kind === 'cpu' ? 2 : Settings.bdiff, bspd: Settings.bspd | 0, park: Settings.park | 0, rp0: rphBits(Settings.rph0), rp1: rphBits(Settings.rph1), cat0: Settings.cat0 | 0, cat1: Settings.cat1 | 0, wx: Settings.wx | 0, easy: Settings.easy ? 1 : 0, pr0: prepEncode(Settings.prep0), pr1: prepEncode(Settings.prep1), pf0: handEncode(Settings.pform0), pf1: handEncode(Settings.pform1), bh0: handEncode(Settings.bh0), bh1: handEncode(Settings.bh1), bbh0: handEncode(Settings.bbh0), bbh1: handEncode(Settings.bbh1), ph0: Settings.ph0 | 0, ph1: Settings.ph1 | 0, pc: Settings.pclock ? 1 : 0 });
+const gameOpt = kind => ({ lu0: luEncode(Settings.lu0), lu1: luEncode(Settings.lu1), bn0: luEncode(Settings.bn0), bn1: luEncode(Settings.bn1), diff0: Settings.bdiff, diff1: kind === 'cpu' ? ({ veasy: 3, easy: 2, normal: 2, hard: 1 }[Settings.cpu] ?? 2) : Settings.bdiff, bspd: Settings.bspd | 0, park: Settings.park | 0, rp0: rphBits(Settings.rph0), rp1: rphBits(Settings.rph1), cat0: Settings.cat0 | 0, cat1: Settings.cat1 | 0, wx: Settings.wx | 0, easy: Settings.easy ? 1 : 0, pr0: prepEncode(Settings.prep0), pr1: prepEncode(Settings.prep1), pf0: handEncode(Settings.pform0), pf1: handEncode(Settings.pform1), bh0: handEncode(Settings.bh0), bh1: handEncode(Settings.bh1), bbh0: handEncode(Settings.bbh0), bbh1: handEncode(Settings.bbh1), ph0: Settings.ph0 | 0, ph1: Settings.ph1 | 0, pc: Settings.pclock ? 1 : 0 });
 const teamName = i => (String(Settings['team' + i] || '').trim() || ['치즈 타이거즈', '블루 라이언즈'][i]).slice(0, 8);
 let series = [0, 0], lastKind = null, lastN = 2;   // 연속 경기 전적, 마지막으로 한 모드
 function startGame(kind, cont) {
@@ -2539,17 +2562,20 @@ function ctrlHTML(kind) {
       ? `<div class="note">${Settings.board ? '화면 양옆' : '화면 아래'} <b>왼쪽 버튼</b>은 ${esc(Names[0])}, <b>오른쪽 버튼</b>은 ${esc(Names[1])}예요</div>` : '';
     return head + `<table class="keys mini">
       <tr><td>움직이기</td><td><kbd>◀</kbd><kbd>▶</kbd><kbd>▲</kbd><kbd>▼</kbd> 또는 화면을 손가락으로</td></tr>
-      <tr><td>결정·던지기·스윙</td><td>큰 버튼 (또는 화면 톡)</td></tr></table>` + tips;
+      <tr><td>결정·던지기·스윙</td><td>큰 버튼 (또는 화면 톡)</td></tr>
+      <tr><td>타자 작전</td><td>위쪽 작전 카드를 톡</td></tr></table>` + tips;
   }
   if (kind === 'local') return `<table class="keys mini">
       <tr><th></th><th>${esc(Names[0])} (1P)</th><th>${esc(Names[1])} (2P)</th></tr>
       <tr><td>움직이기</td><td><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></td><td>방향키</td></tr>
-      <tr><td>결정·스윙</td><td><kbd>F</kbd></td><td><kbd>Enter</kbd></td></tr>${hideOn() ? `
+      <tr><td>결정·스윙</td><td><kbd>F</kbd></td><td><kbd>Enter</kbd></td></tr>
+      <tr><td>타자 작전</td><td>숫자 <kbd>1</kbd>~<kbd>7</kbd></td><td>숫자패드 <kbd>1</kbd>~<kbd>7</kbd></td></tr>${hideOn() ? `
       <tr><td>🤫 비밀 투구</td><td><kbd>QWE</kbd><br><kbd>ASD</kbd><br><kbd>ZXC</kbd></td><td>숫자패드<br><kbd>789</kbd><br><kbd>456</kbd><br><kbd>123</kbd></td></tr>
       <tr><td>수비 위치</td><td><kbd>R</kbd></td><td>숫자패드 <kbd>0</kbd></td></tr>` : ''}</table>${hideOn() ? '<div class="tips mini">🤫 <b>비밀 작전</b>: 투수는 카드 옆 키로 공을 고르고, 같은 9개 키로 코스를 누르면 바로 던져요 (1P는 QWE가 위 줄, 2P 숫자패드는 789가 위 줄). 고른 공·코스·타자 작전은 화면에 안 보여요!</div>' : ''}` + tips;
   return `<table class="keys mini">
       <tr><td>움직이기</td><td>방향키 또는 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> (마우스도 돼요)</td></tr>
-      <tr><td>결정·스윙</td><td><kbd>Space</kbd> <kbd>Enter</kbd> <kbd>F</kbd> (또는 클릭)</td></tr></table>` + tips;
+      <tr><td>결정·스윙</td><td><kbd>Space</kbd> <kbd>Enter</kbd> <kbd>F</kbd> (또는 클릭)</td></tr>
+      <tr><td>타자 작전</td><td>숫자 <kbd>1</kbd>~<kbd>7</kbd> 또는 위쪽 작전 카드 클릭</td></tr></table>` + tips;
 }
 function showReady() {
   paused = true; clearEdges();
@@ -2682,6 +2708,7 @@ function withPtr(g, i, inp) {
   if (g && cmdQ[i][0] === 14) { if (g.phase === 'result') return { x: 0, y: 0, hit: false, cmd: cmdQ[i].shift() }; if (g.phase !== 'var') cmdQ[i].shift(); }   // 비디오 판독 요청
   if (g && cmdQ[i].length) { if (g.phase === 'select') return { x: 0, y: 0, hit: false, cmd: cmdQ[i].shift() }; if (g.phase === 'over') cmdQ[i].length = 0; }
   if (!g || mode === 'demo') return inp;
+  if (tacK[i] >= 0) { const m = tacK[i]; tacK[i] = -1; if ((g.phase === 'select' || g.phase === 'aim') && batTeam(g) === i && !g.easy && !g.derby) return { x: inp.x, y: inp.y, hit: false, cmd: 16 + m }; }
   const ptr = mode === 'local' ? PT[i] : PT[0];
   if (g.pitchN !== ptr.n) { ptr.n = g.pitchN; ptr.on = false; }          // 새 공마다: 마우스를 움직여야 다시 따라옴
   if (inp.x || inp.y) { ptr.on = false; ptr.dcard = -1; ptr.card = -1; return inp; }   // 키보드·버튼을 쓰면 키보드가 우선
@@ -2738,6 +2765,7 @@ cv.addEventListener('pointermove', e => {
 cv.addEventListener('pointerdown', e => {
   if (!inGame() || paused) return;
   const p = toLogical(e), g = isOnline() ? RB && RB.G : G;
+  if (g && showTac(g)) { const m = tacAt(p); if (m >= 0) { tacK[mode === 'local' ? batTeam(g) : mode === 'guest' ? 1 : 0] = m; Sound.get(); e.preventDefault(); return; } }   // 작전 카드 톡
   const po = g ? pitchOpts(g) : [], st = cardStep(po.length);
   const card = g && g.phase === 'select' && p.x >= 396 && p.y >= 100 && p.y < 100 + po.length * st, dcard = g && g.phase === 'select' && p.x <= 80 && p.y >= 112 && p.y < 112 + DEFS.length * 21;
   let who = mode === 'guest' ? 1 : 0;
@@ -3258,7 +3286,7 @@ function specNewMatch(m) {
 }
 function specInput(p, m) {
   if (!m || m.m !== Spec.mid || typeof m.d !== 'string') return;
-  for (let i = 0; i < m.d.length; i++) { const c = m.d.charCodeAt(i) - 65; if (c >= 0 && c < 34 && m.s + i >= Spec.frame) Spec.inp[p][m.s + i] = c; }
+  for (let i = 0; i < m.d.length; i++) { const c = m.d.charCodeAt(i) - 65; if (c >= 0 && c < 41 && m.s + i >= Spec.frame) Spec.inp[p][m.s + i] = c; }
 }
 function specSync(m) {
   if (!m || m.m !== Spec.mid || typeof m.s !== 'string' || !Spec.G) return;
