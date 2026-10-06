@@ -96,6 +96,8 @@ kbd{display:inline-block;min-width:26px;padding:1px 6px;border-radius:7px;backgr
 .quick{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 6px}
 .qchip{font-family:inherit;font-size:12px;color:#8a6f48;background:#fff;border:1.5px solid #f0dcb6;border-radius:14px;padding:5px 10px;cursor:pointer}
 .qchip:active{background:#fff6d6}
+body.side #touch{position:fixed;left:0;right:0;top:0;bottom:0;pointer-events:none;display:flex;justify-content:space-between;align-items:flex-end;padding:0 10px 14px;width:auto!important;z-index:5;margin:0}
+body.side #touch>*{pointer-events:auto}
 /* 전자칠판 모드 */
 body.board{touch-action:none;overscroll-behavior:none}
 body.board #touch{position:fixed;left:0;right:0;bottom:0;top:0;pointer-events:none;display:flex;justify-content:space-between;align-items:flex-end;padding:0 1.2vw 3vh;width:auto!important;z-index:5;gap:0}
@@ -106,6 +108,9 @@ body.board #touch{position:fixed;left:0;right:0;bottom:0;top:0;pointer-events:no
 .bgrid .tb{width:100%;height:auto;aspect-ratio:1;border-radius:24%;font-size:calc(var(--bw)*.13);border:4px solid var(--pc);box-shadow:0 5px 0 rgba(0,0,0,.28)}
 .bgrid .tb.hit{grid-area:h;aspect-ratio:auto;width:100%;height:calc(var(--bw)*.36);border-radius:20px;font-size:calc(var(--bw)*.15);border-color:#fff}
 .bgrid .bup{grid-area:u}.bgrid .bleft{grid-area:l}.bgrid .bright{grid-area:r}.bgrid .bdown{grid-area:d}
+@media (max-height:500px),(max-width:520px){#hud-menu,#hud-sub,#hud-cheer{font-size:11px!important;padding:1px 7px!important;top:3px!important;border-radius:8px!important}#hud-sub{left:calc(50% - 92px)!important}#hud-cheer{left:calc(50% + 38px)!important}}
+body.smallst #hud-sub{left:6px!important;top:calc(var(--sc,1)*41px)!important}
+body.smallst #hud-cheer{left:auto!important;right:6px!important;top:calc(var(--sc,1)*60px)!important}
 </style>
 <style>
 body{background:linear-gradient(160deg,#5c2e0e,#8a4a1c 60%,#a85d25)}
@@ -1606,15 +1611,24 @@ function layout() {
   const board = document.body.classList.contains('board') && touchEl.style.display === 'flex';
   let w;
   if (board) {                                   // 양옆에 큰 패드 자리를 비우고 가운데에 게임
+    document.body.classList.remove('side');
     const bw = Math.round(clamp(Math.min(innerWidth * 0.16, innerHeight * 0.3), 130, 320));
     touchEl.style.setProperty('--bw', bw + 'px');
     w = Math.floor(Math.min(innerWidth - 2 * (bw + innerWidth * 0.012) - 20, (innerHeight - 16) * W / H, 1500));
   } else {
-    const touchH = touchEl.style.display === 'flex' ? touchEl.offsetHeight + 10 : 0;
+    const on = touchEl.style.display === 'flex';
+    document.body.classList.remove('side'); touchEl.style.width = '';
+    const touchH = on ? touchEl.offsetHeight + 10 : 0;
     w = Math.floor(Math.min(innerWidth - 16, (innerHeight - 16 - touchH) * W / H, 1000));
-    touchEl.style.width = w + 'px';
+    if (on && innerWidth > innerHeight) {                          // 가로 화면: 양옆에 버튼을 두는 게 더 크면 그렇게
+      const pw = Math.max(0, ...[...touchEl.children].map(c => c.offsetWidth));
+      const ws = Math.floor(Math.min(innerWidth - 2 * (pw + 18), (innerHeight - 16) * W / H, 1000));
+      if (ws > w * 1.08) { w = ws; document.body.classList.add('side'); }
+    }
+    if (!document.body.classList.contains('side')) touchEl.style.width = w + 'px';
   }
   stage.style.width = w + 'px'; stage.style.height = Math.round(w * H / W) + 'px';
+  stage.style.setProperty('--sc', w / W); document.body.classList.toggle('smallst', w < 640);
   scale = w / W; dpr = Math.min(window.devicePixelRatio || 1, 2);
   cv.width = Math.round(w * dpr); cv.height = Math.round(w * H / W * dpr);
   buildBg();
@@ -2082,9 +2096,9 @@ function render(v, now, dt) {
   }
 }
 // 투수 vs 타자 화면
-const TAC_X0 = 98, TAC_Y = 57, TAC_W = 38, TAC_H = 13, TAC_G = 3;
+const TAC_X0 = 98, TAC_Y = 57, TAC_W = 38, TAC_G = 3; let TAC_H = 13;   // 터치 화면에선 카드가 더 커요
 function showTac(v) { return v && (v.phase === 'select' || v.phase === 'aim') && !v.derby && !v.easy && mode !== 'demo' && mode !== 'spec' && (mode === 'local' || myTeam(v.bat !== undefined ? v.bat : v.half)); }
-function tacAt(p) { if (p.y < TAC_Y - 2 || p.y > TAC_Y + TAC_H + 2) return -1; const m = Math.floor((p.x - TAC_X0 + TAC_G / 2) / (TAC_W + TAC_G)); return m >= 0 && m < 7 ? m : -1; }
+function tacAt(p) { if (p.y < TAC_Y - 4 || p.y > TAC_Y + TAC_H + 4) return -1; const m = Math.floor((p.x - TAC_X0 + TAC_G / 2) / (TAC_W + TAC_G)); return m >= 0 && m < 7 ? m : -1; }
 function drawDuel(v, now) {
   const pit = v.pit, bat = v.bat, bl = v.ball;
   // 투수
@@ -2210,6 +2224,7 @@ function drawDuel(v, now) {
   }
   // 작전 카드 (위쪽 한 줄): 숫자 1~7 키나 톡으로 바로 골라요
   if (showTac(v)) {
+    TAC_H = touchUI() ? 20 : 13;
     const TL = ['강공', '번트', '도루', '런앤히트', '히트앤런', '더블스틸', '홈스틸'], secret = hid && !peek;
     for (let m = 0; m < 7; m++) {
       const x = TAC_X0 + m * (TAC_W + TAC_G), ok = modeOK(v, m), cur = !secret && v.bmode === m;
@@ -2263,7 +2278,7 @@ function drawDuel(v, now) {
   else if (v.tut) msg = '';
   else if (v.derby) msg = v.phase === 'pitch' ? `🏏 ${Names[bat]}: ${mv(bat)}로 노란 원을 공에 맞추고 ${hk(bat)} 스윙!` : `💥 ${Names[bat]} · 남은 공 ${v.dleft[bat]}개 · 홈런 ${v.score[bat]}개 — 공이 곧 와요!`;
   else if ((v.phase === 'select' || v.phase === 'aim') && myTeam(bat) && mode !== 'local' && v.easy) msg = `🏏 ${mv(bat)}로 노란 원을 미리 옮겨 두세요 · 공이 오면 ${hk(bat)} 스윙!`;
-  else if ((v.phase === 'select' || v.phase === 'aim') && myTeam(bat) && mode !== 'local') msg = `🏏 숫자 1~7(또는 ${hk(bat)})로 작전 고르기 (지금: ${BMODES[v.bmode]}) · ${mv(bat)}로 노란 원 미리 옮기기`;
+  else if ((v.phase === 'select' || v.phase === 'aim') && myTeam(bat) && mode !== 'local') msg = `🏏 ${touchUI() ? '위쪽 작전 카드를 톡해서' : `숫자 1~7(또는 ${hk(bat)})로`} 작전 고르기 (지금: ${BMODES[v.bmode]}) · ${mv(bat)}로 노란 원 미리 옮기기`;
   else if (v.phase === 'select' && v.easy) msg = myTeam(pit) ? `⚾ ${Names[pit]}: ${touchUI() ? '◀ ▶ 또는 카드' : mode === 'local' ? (pit === 0 ? 'A D' : '← →') : '← →'}로 공 고르기 → ${hk(pit)} 결정` : `${Names[pit]} 투수가 공을 고르는 중…`;
   else if ((v.phase === 'select' || v.phase === 'aim') && mode === 'local' && hideOn() && !v.easy) msg = `🤫 ${Names[pit]} 투수: ${v.phase === 'select' ? `카드 옆 키(${HKEY_TXT[pit]})로 몰래 공 고르기 · ${HDEF_LBL[pit]} 수비 위치` : `${HKEY_TXT[pit]} 9칸 중 한 곳을 누르면 바로 던져요${pit ? ' (7 8 9가 위 줄)' : ''}`}`;
   else if (v.phase === 'select') msg = myTeam(pit) ? `⚾ ${Names[pit]}: ${touchUI() ? '◀ ▶' : mode === 'local' ? (pit === 0 ? 'A D' : '← →') : '← →'} 구종 · ${touchUI() ? '▲ ▼' : mode === 'local' ? (pit === 0 ? 'W S' : '↑ ↓') : '↑ ↓'} 수비 위치 → ${hk(pit)} 결정` : `${Names[pit]} 투수가 구종을 고르는 중…`;
@@ -2271,7 +2286,7 @@ function drawDuel(v, now) {
   else if (v.phase === 'pitch' && myTeam(pit) && !myTeam(bat) && v.bases.some(x => x) && !v.easy) msg = `🧤 ${Names[pit]}: 공이 미트에 들어올 때 ${hk(pit)}! (블로킹 · 도루 저지)`;
   else if (v.phase === 'pitch') msg = myTeam(bat) ? (v.bmode === 1 ? `🤏 번트: ${mv(bat)}로 노란 원을 공에 대기만 하면 돼요` : `🏏 ${Names[bat]} 타자: ${mv(bat)}로 노란 원을 공에 맞추고 ${hk(bat)} 스윙!`) : '';
   if (msg) outlined(msg, HALF, 292, 8.5, '#fff', '#111');
-  if (mode === 'local' && !v.derby && !v.easy && (v.phase === 'select' || v.phase === 'aim')) outlined(`🏏 ${Names[bat]}: ${bat ? '숫자패드' : '숫자'} 1~7 작전 고르기 (지금: ${hideOn() && !peek ? '🤫' : BMODES[v.bmode]}) · ${mv(bat)} 노란 원 옮기기`, HALF, 280, 7.5, '#ffe066', '#111');
+  if (mode === 'local' && !v.derby && !v.easy && (v.phase === 'select' || v.phase === 'aim')) outlined(`🏏 ${Names[bat]}: ${touchUI() ? '위쪽 카드 톡' : bat ? '숫자패드 1~7' : '숫자 1~7'} 작전 고르기 (지금: ${hideOn() && !peek ? '🤫' : BMODES[v.bmode]}) · ${mv(bat)} 노란 원 옮기기`, HALF, 280, 7.5, '#ffe066', '#111');
   if (mode === 'local' && !v.derby && !v.easy && v.phase === 'pitch' && v.bases.some(x => x)) outlined(`🧤 ${Names[pit]}: 공이 미트에 들어올 때 ${hk(pit)} (블로킹 · 도루 저지)`, HALF, 280, 7.5, '#a5d8ff', '#111');
 }
 // 타구가 날아가는 화면 (위에서 본 경기장)
