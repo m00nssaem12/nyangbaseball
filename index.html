@@ -111,6 +111,9 @@ body.board #touch{position:fixed;left:0;right:0;bottom:0;top:0;pointer-events:no
 @media (max-height:500px),(max-width:520px){#hud-menu,#hud-sub,#hud-cheer{font-size:11px!important;padding:1px 7px!important;top:3px!important;border-radius:8px!important}#hud-sub{left:calc(50% - 92px)!important}#hud-cheer{left:calc(50% + 38px)!important}}
 body.smallst #hud-sub{left:6px!important;top:calc(var(--sc,1)*41px)!important}
 body.smallst #hud-cheer{left:auto!important;right:6px!important;top:calc(var(--sc,1)*60px)!important}
+#hud-cam{position:absolute;top:6px;left:calc(50% + 140px);border:none;background:rgba(255,255,255,.85);border-radius:10px;font-size:15px;padding:3px 8px;cursor:pointer;font-family:inherit;display:none;box-shadow:0 2px 0 rgba(0,0,0,.2)}
+@media (max-height:500px),(max-width:520px){#hud-cam{font-size:11px!important;padding:1px 6px!important;top:3px!important;left:calc(50% + 104px)!important}}
+body.smallst #hud-cam{left:auto!important;right:6px!important;top:calc(var(--sc,1)*78px)!important}
 </style>
 <style>
 body{background:linear-gradient(160deg,#5c2e0e,#8a4a1c 60%,#a85d25)}
@@ -220,6 +223,7 @@ table.keys td,table.keys th{white-space:nowrap}
     <div id="tut-box" style="display:none"></div>
     <button id="hud-var" data-act="var">📺 비디오 판독 요청</button>
     <button id="hud-cheer" data-act="cheer">📣 응원</button>
+    <button id="hud-cam" data-act="cam" title="화면 시점 바꾸기 (V)">📷</button>
     <button id="hud-sub" data-act="sub">🔄 교체</button>
   </div>
   <div id="touch"></div>
@@ -237,6 +241,7 @@ table.keys td,table.keys th{white-space:nowrap}
   <div class="cpurow"><span>컴퓨터 실력</span><div class="seg" data-set="cpu"><button data-v="veasy">아주 쉬움</button><button data-v="easy">쉬움</button><button data-v="normal">보통</button><button data-v="hard">어려움</button></div></div>
   <button class="btn blue" data-act="local">👥 둘이서 (한 기기)</button>
   <button class="btn green" data-act="online">🌐 온라인 대전</button>
+  <button class="btn" data-act="watch" style="background:#ffe8a3;box-shadow:0 5px 0 #e0b84a;font-size:17px;padding:8px 0">👀 친구 경기 관전하기 (구경·응원)</button>
   <div class="row2"><button class="btn" data-act="team" id="btn-team" style="background:#63e6be;box-shadow:0 5px 0 #2f9e7a">⚾ 우리 팀</button><button class="btn" data-act="settings" id="btn-settings" style="background:#ffe8a3;box-shadow:0 5px 0 #e0b84a">⚙️ 경기 설정</button></div>
   <div class="row2"><button class="btn" data-act="derby" style="background:#ff8787;box-shadow:0 5px 0 #c92a2a">💥 홈런 더비</button><button class="btn" data-act="league" style="background:#b197fc;box-shadow:0 5px 0 #7048e8">🏆 리그전</button></div>
   <div class="row mini4"><button class="btn gray" data-act="help">🎮 조작법</button><button class="btn gray" data-act="sound" id="btn-sound">🔊 소리 켜짐</button><button class="btn gray" data-act="music" id="btn-music">🎵 음악 ON</button><button class="btn gray" data-act="board" id="btn-board">🖥 전자칠판</button></div>
@@ -284,7 +289,7 @@ table.keys td,table.keys th{white-space:nowrap}
     🧤 <b>수비 조작</b>: 아슬아슬한 뜬공·직선타가 나오면 수비 팀이 방향키(마우스·손가락)로 수비수를 공 떨어질 곳(⭕)으로 움직여요 · 멀리서 잡으면 다이빙 캐치!<br>
     🌧 <b>날씨</b>: 비가 오면 실책·폭투가 늘고 많이 오면 우천 콜드게임 · 순풍이면 공이 멀리, 역풍이면 덜 날아가요 · 💥 홈런은 비거리(m)가 나오고, 경기가 끝나면 <b>타구 지도</b>를 볼 수 있어요 · 🎉 선수마다 <b>홈런 세리머니</b>와 🎵 <b>타석 응원가</b>를 정할 수 있어요 (팀·타순 → 선수 꾸미기)<br>
     🐣 <b>쉬운 야구 / ⚾ 진짜 야구</b> (첫 화면): 쉬운 야구는 투수가 빠른 공·느린 공·휘는 공 중에 고르기만 하고, 수비 위치·작전·견제·비디오 판독·수비 조작이 없어요 · 진짜 야구는 모든 기능이 다 나와요 (온라인은 방장 설정을 따라요)<br>
-    🎓 처음이면 첫 화면의 <b>1분 연습하기</b>로 원 움직이기 → 타이밍 → 안타 → 뜬공 → 투수까지 따라 해 봐요 · 👀 온라인 방 코드로 <b>관전</b>하며 응원할 수 있어요 · 💾 팀·리그를 <b>파일로 저장</b>해서 다른 컴퓨터로 옮길 수 있어요<br>
+    🎓 처음이면 첫 화면의 <b>1분 연습하기</b>로 원 움직이기 → 타이밍 → 안타 → 뜬공 → 투수까지 따라 해 봐요 · 👀 첫 화면의 <b>친구 경기 관전하기</b>에 방 코드를 넣으면 여러 명이 구경하며 응원할 수 있어요 · 🏟 <b>관중석 시점</b>: 경기 중 <kbd>V</kbd>(또는 위쪽 🏟 버튼)를 누르면 관중석에서 경기장 전체를 내려다봐요 (조준·타격은 오른쪽 작은 중계 화면에서) · 😾 <b>벤치 클리어링</b>(설정): 몸에 맞는 공이 나오면 맞은 팀이 결정 버튼을 눌러 양 팀이 우르르 몰려나오게 할 수 있어요 (팀마다 한 경기에 1번 · 심판이 말리면 화해해요) · 📺 비디오 판독은 팀마다 한 경기에 2번 · 💾 팀·리그를 <b>파일로 저장</b>해서 다른 컴퓨터로 옮길 수 있어요<br>
     📋 스트라이크 3개면 삼진, 볼 4개면 볼넷, 3아웃이면 공수 교대 · 마지막 회까지 점수가 많은 팀이 승리 (동점이면 연장 2회까지)<br>
     💡 혼자 할 때는 방향키·WASD 모두 되고, <kbd>Space</kbd>도 돼요 · ⏸ <kbd>Esc</kbd> 일시정지
   </div>
@@ -354,6 +359,10 @@ table.keys td,table.keys th{white-space:nowrap}
     <div class="seg" data-set="wx"><button data-v="0">☀️맑음</button><button data-v="1">🌧비</button><button data-v="2" title="순풍: 홈런이 잘 나와요">순풍</button><button data-v="3" title="역풍: 공이 덜 날아가요">역풍</button><button data-v="4">🎲</button></div>
     <span>피치클락</span>
     <div class="seg" data-set="pclock"><button data-v="1" title="투수는 주자 없을 때 15초, 있을 때 20초 안에 던져야 해요 (넘기면 자동 볼) · 견제는 타석마다 2번까지">⏱ 켜기</button><button data-v="0">끄기</button></div>
+    <span>벤치 클리어링</span>
+    <div class="seg" data-set="bclear"><button data-v="1" title="몸에 맞는 공이 나오면 맞은 팀이 결정 버튼을 눌러 양 팀 선수들이 우르르 몰려나오게 해요 (심판이 말리면 화해)">😾 켜기</button><button data-v="0">끄기</button></div>
+    <span>화면 시점</span>
+    <div class="seg" data-set="cam"><button data-v="catcher">📺 중계 (포수 뒤)</button><button data-v="stand">🏟 관중석</button></div>
     <span>비밀 작전</span>
     <div class="seg" data-set="hide"><button data-v="0">끄기</button><button data-v="1" title="둘이서 키보드로 할 때: 투수는 손 가까이 모인 키로 구종·코스를, 타자는 작전을 상대 몰래 정해요">🤫 켜기 (둘이서·키보드)</button></div>
     <span>게임 속도</span>
@@ -374,7 +383,7 @@ table.keys td,table.keys th{white-space:nowrap}
   <label class="lb" style="margin-top:8px">우리 선수 색</label>
   <div class="sw" data-side="me" style="justify-content:center"></div>
   <button class="btn" data-act="create">방 만들기</button>
-  <div class="or">— 또는 친구 방에 참가 —</div>
+  <div class="or">— 또는 친구 방에 참가 · 👀 관전 —</div>
   <div class="row">
     <input class="txt" id="in-code" maxlength="4" placeholder="방 코드" style="text-transform:uppercase;flex:1">
     <button class="btn blue" data-act="join" style="width:auto;padding:0 20px">참가</button><button class="btn" data-act="spectate" style="width:auto;padding:0 12px;background:#ffe8a3;box-shadow:0 5px 0 #e0b84a" title="경기를 구경하고 응원만 해요">👀 관전</button>
@@ -386,6 +395,7 @@ table.keys td,table.keys th{white-space:nowrap}
 <div class="screen" id="scr-room"><div class="card">
   <div class="note">방 코드</div>
   <div class="code" id="room-code">----</div>
+  <div class="note" style="font-size:12px;color:#8a6f48">👀 다른 친구들은 이 코드로 <b>관전</b>할 수 있어요 (첫 화면 → 친구 경기 관전하기) · 관전하면 🏟 관중석 시점으로 보여요</div>
   <div class="players"><div class="pl" id="room-p1"></div><div class="vs">VS</div><div class="pl" id="room-p2"></div></div>
   <div class="note" id="room-info"></div>
   <div id="room-keys"></div>
@@ -557,7 +567,7 @@ function newGame(innings, rate, seed, opt) {
               src: [[0, 1, 2, 3, 4, 5, 6, 7, 8], [0, 1, 2, 3, 4, 5, 6, 7, 8]], sub: null,
               hand: [handDecode(opt.bh0, 9), handDecode(opt.bh1, 9)], bhand: [handDecode(opt.bbh0, 3), handDecode(opt.bbh1, 3)], phand: [(opt.ph0 | 0) % 2, (opt.ph1 | 0) % 2], score: [0, 0], line: [[], []], hits: [0, 0], phase: 'ready', timer: 0, winner: -1,
               ptype: 0, lx: 0, ly: 0, def: [0, 0], bmode: 0, tu: 0, tv: 0, cu: 0, cv: 0, ball: null, swing: -1, swung: 0, res: null, pitchN: 0,
-              fx: { dp: 0, sub: 0, steal: 0, bunt: 0, pitch: 0, swing: 0, hit: 0, catch: 0, strike: 0, ball: 0, out: 0, run: 0, hr: 0, foul: 0, whistle: 0, win: 0, change: 0, px: 0, py: 0, kind: 0 } };
+              fx: { bench: 0, dp: 0, sub: 0, steal: 0, bunt: 0, pitch: 0, swing: 0, hit: 0, catch: 0, strike: 0, ball: 0, out: 0, run: 0, hr: 0, foul: 0, whistle: 0, win: 0, change: 0, px: 0, py: 0, kind: 0 } };
   G.pst = [[[G.phand[0], 0, 0, 0, 0, 0]], [[G.phand[1], 0, 0, 0, 0, 0]]];
   G.st = [0, 1].map(() => Array.from({ length: 12 }, () => [0, 0, 0, 0, 0, 0, 0]));   // 선수 기록 [타수, 안타, 홈런, 타점, 득점, 볼넷, 삼진]
   G.prp = [opt.pr0 == null ? DEF_PREP.slice() : prepDecode(opt.pr0), opt.pr1 == null ? DEF_PREP.slice() : prepDecode(opt.pr1)];
@@ -570,6 +580,7 @@ function newGame(innings, rate, seed, opt) {
   capTypes(G.lu[0], G.bench[0]); capTypes(G.lu[1], G.bench[1]);
   G.rph = [opt.rp0 == null ? DEF_RPH.slice() : bitsRph(opt.rp0 | 0), opt.rp1 == null ? DEF_RPH.slice() : bitsRph(opt.rp1 | 0)];   // 구원 투수 손 (0 우투, 1 좌투)
   G.park = (opt.park | 0) % PARKS.length; G.fence = PARKS[G.park].fence; G.nd = opt.nd ? 1 : 0;   // nd: 무승부 없음 (토너먼트)
+  G.bclear = opt.bc === 0 ? 0 : 1; G.hbpN = [0, 0]; G.bcl = [1, 1];   // 벤치 클리어링은 팀마다 한 경기에 1번                    // 벤치 클리어링 (설정에서 끌 수 있어요) · 투수 팀별 몸에 맞는 공 수
   G.pclock = opt.pc && !G.easy && !opt.derby ? 1 : 0; G.pc = 0; G.ct = -1; G.rd = null; G.pko = 0;   // 피치클락 · 포수 타이밍 · 런다운 · 견제 횟수
   if (opt.derby) { G.derby = opt.derby; G.dleft = [DERBY_N, opt.derby === 2 ? DERBY_N : 0]; G.dw = 0; G.bo = [3, 3]; G.innings = 1; }   // 홈런 더비: 4번 타자가 10개씩
   G.line[0].push(0);
@@ -1073,7 +1084,12 @@ function tick(G, inputs) {
       if (bl.f >= bl.t + 10) {                                       // 공이 포수 미트에
         const end = ballAt(bl, 1), inZone = Math.abs(end.u) <= 1.05 && Math.abs(end.v) <= 1.05, inside = batHand(G) === 1 ? end.u : -end.u;
         G.fx.catch++;
-        if (!G.derby && G.swing < 0 && !bl.bnc && !bl.po && inside > 1.45 && end.v > -1.3 && end.v < 1.5) { finishPA(G, { kind: 'hbp', out: 0, bases: 0, text: '몸에 맞는 공! 🤕 1루로 걸어 나가요' }); return; }   // 데드볼
+        if (!G.derby && G.swing < 0 && !bl.bnc && !bl.po && inside > 1.35 && end.v > -1.3 && end.v < 1.5) {   // 데드볼
+          const pt = pitTeam(G); G.hbpN[pt]++;
+          finishPA(G, { kind: 'hbp', out: 0, bases: 0, text: '몸에 맞는 공! 🤕 1루로 걸어 나가요' });
+          if (G.bclear && !G.easy && !G.tut && G.bcl[batTeam(G)] > 0) { G.res.bq = 1; G.timer += Math.round(G.rate * 1.6); G.res.bqT = G.timer - Math.round(G.rate * 0.4); }   // 0.4초 뒤부터 (늦은 스윙이 잘못 눌리지 않게)   // 맞은 팀이 결정 버튼을 누르면 벤치 클리어링 (조금 더 기다려 줘요)
+          return;
+        }
         const q = ctQ(G, bl), blk = catOf(G, pitTeam(G)).blk * (1 - 0.65 * q);   // 포수 블로킹: 타이밍 맞춰 누르면 폭투가 확 줄어요
         const far = Math.max(bl.bnc ? 0.05 + (end.v - BOUNCE_V) : -1, Math.abs(end.u) - 1.6), wild = !G.derby && !G.easy && G.bases.some(x => x) && far > 0 && rnd(G) < (0.3 + 0.4 * Math.min(1, far)) * blk * (G.wx === 1 ? 1.4 : 1) || (bl.knk && !G.derby && G.bases.some(x => x) && rnd(G) < 0.1 * blk);
         const blkTxt = bl.bnc && !wild && q >= 0.5 && !G.easy ? ' · 🧤 블로킹!' : '';
@@ -1102,6 +1118,9 @@ function tick(G, inputs) {
     }
     case 'result':
       for (const t of [0, 1]) { const c = (inputs[t] || IDLE).cmd; if (c === 14) reqVar(G, t); }
+      if (G.res && G.res.bq && !G.res.bench && G.timer <= G.res.bqT && (inputs[batTeam(G)] || IDLE).hit) {   // 😾 벤치 클리어링! (몸에 맞은 팀이 버튼)
+        G.bcl[batTeam(G)]--; G.res.bench = 1; G.res.BT = Math.round(G.rate * 5.8); G.timer = G.res.BT; G.res.text = '몸에 맞는 공! 😾 벤치 클리어링!'; G.fx.bench++;
+      }
       if (G.phase === 'result' && --G.timer <= 0) afterResult(G);
       break;
     case 'var': if (--G.timer <= 0) finishVar(G); break;
@@ -1176,6 +1195,11 @@ function aiInput(ai, G) {
     }
     return inp;
   }
+  if (G.phase === 'result' && G.res && G.res.bq && !G.res.bench && batTeam(G) === ai.me) {   // 컴퓨터 팀이 맞으면 가끔 벤치 클리어링
+    if (ai.bqFor !== G.pitchN) { ai.bqFor = G.pitchN; ai.bqAt = Math.random() < (G.hbpN[pitTeam(G)] >= 2 ? 0.6 : 0.3) ? ai.t + 30 + Math.floor(Math.random() * 40) : -1; }
+    if (ai.bqAt >= 0 && ai.t >= ai.bqAt) { ai.bqAt = -1; inp.hit = true; }
+    return inp;
+  }
   if (pitTeam(G) === ai.me) {                                       // 투수
     if (G.phase === 'pitch' && G.ball && !G.derby && !G.easy && G.bases.some(x => x)) {   // 포수: 공이 미트에 들어올 때 블로킹·송구 준비
       if (ai.ctFor !== G.pitchN) { ai.ctFor = G.pitchN; ai.ctAt = Math.random() < (lv.sub ? 0.85 : 0.5) ? G.ball.t + Math.round((Math.random() * 2 - 1) * lv.terr * 1.3) : -1; }
@@ -1195,7 +1219,8 @@ function aiInput(ai, G) {
       else if (lv.ibb && !b[0] && (b[1] || b[2]) && slug && G.balls + G.strikes === 0 && G.inning >= G.innings - 1 && Math.random() < lv.ibb) type = IBB;   // 강타자는 거르기
       else if (lv.pick && (b[0] || b[1]) && !b[2] && (G.pko | 0) < 2 && Math.random() < lv.pick) type = PK;                                // 가끔 견제
       else if (lv.pick && b[0] && !b[1] && G.outs < 2 && G.balls < 2 && Math.random() < lv.pick * 0.6) type = PO;                         // 도루 낌새가 보이면 피치아웃
-      ai.plan = { type, u: cu + (Math.random() * 2 - 1) * lv.ctrl, v: cv + (Math.random() * 2 - 1) * lv.ctrl, wait: (G.rate * 1.5 + lv.think * 2.5) * (0.7 + Math.random() * 0.8) };   // 실제 투수처럼 사인을 주고받고 잠깐 뜸을 들여요
+      if (type < NP && G.balls < 3 && Math.random() < (lv.ctrl > 0.1 ? 0.012 : 0.007)) { ai.plan = { type, u: (batHand(G) === 1 ? 1 : -1) * (1.4 + Math.random() * 0.18), v: (Math.random() * 2 - 1) * 0.8, wait: (G.rate * 1.5 + lv.think * 2.5) * (0.7 + Math.random() * 0.8) }; }   // 가끔 손에서 빠져 몸쪽 깊이 (몸에 맞는 공)
+      else ai.plan = { type, u: cu + (Math.random() * 2 - 1) * lv.ctrl, v: cv + (Math.random() * 2 - 1) * lv.ctrl, wait: (G.rate * 1.5 + lv.think * 2.5) * (0.7 + Math.random() * 0.8) };   // 실제 투수처럼 사인을 주고받고 잠깐 뜸을 들여요
     }
     const P = ai.plan;
     if (ai.t < P.wait) return inp;
@@ -1275,7 +1300,7 @@ const IDLE_C = 8;                                                   // 아무 �
 const encIn = i => i.cmd >= 0 ? 18 + i.cmd :   /* 30·31: 투수 교체 */ (i.x + 1) * 6 + (i.y + 1) * 2 + (i.hit ? 1 : 0);   // 18~29: 선수 교체 명령
 const decIn = c => c >= 18 ? { x: 0, y: 0, hit: false, cmd: c - 18 } : ({ x: Math.floor(c / 6) - 1, y: Math.floor((c % 6) / 2) - 1, hit: (c & 1) === 1 });
 
-const matchOpt = match => ({ lu0: match.lu0, lu1: match.lu1, bn0: match.bn0, bn1: match.bn1, bh0: match.bh0, bh1: match.bh1, bbh0: match.bbh0, bbh1: match.bbh1, ph0: match.ph0, ph1: match.ph1, diff0: match.bd | 0, diff1: match.bd | 0, bspd: match.bs == null ? 2 : match.bs | 0, park: match.pk | 0, rp0: match.rp0, rp1: match.rp1, cat0: match.cat0, cat1: match.cat1, wx: match.wx | 0, easy: match.ez | 0, pr0: match.pr0 || null, pr1: match.pr1 || null, pf0: match.pf0, pf1: match.pf1, pc: match.pc | 0 });
+const matchOpt = match => ({ lu0: match.lu0, lu1: match.lu1, bn0: match.bn0, bn1: match.bn1, bh0: match.bh0, bh1: match.bh1, bbh0: match.bbh0, bbh1: match.bbh1, ph0: match.ph0, ph1: match.ph1, diff0: match.bd | 0, diff1: match.bd | 0, bspd: match.bs == null ? 2 : match.bs | 0, park: match.pk | 0, rp0: match.rp0, rp1: match.rp1, cat0: match.cat0, cat1: match.cat1, wx: match.wx | 0, easy: match.ez | 0, pr0: match.pr0 || null, pr1: match.pr1 || null, pf0: match.pf0, pf1: match.pf1, pc: match.pc | 0, bc: match.bc === 0 ? 0 : 1 });
 function createRollback(match, me, send, sendSync) {
   const rb = {
     me, rem: 1 - me, mid: match.id, G: newGame(match.len, match.rate, match.seed, matchOpt(match)),
@@ -1391,7 +1416,7 @@ function viewFromGame(G, a) {
 
 /* ================= 설정 ================= */
 const Settings = (() => {
-  const d = { winScore: 3, bdiff: 0, bspd: 2, park: 0, wx: 0, easy: 1, pclock: 1, hide: 0, team0: '치즈 타이거즈', team1: '블루 라이언즈', logo0: 0, logo1: 3, lu0: null, lu1: null, pn0: null, pn1: null, speed: 'normal', cpu: 'normal', name: '', sound: true, skins: [0, 1], mySkin: 0 };
+  const d = { winScore: 3, bdiff: 0, bspd: 2, park: 0, wx: 0, easy: 1, pclock: 1, hide: 0, bclear: 1, cam: 'catcher', team0: '치즈 타이거즈', team1: '블루 라이언즈', logo0: 0, logo1: 3, lu0: null, lu1: null, pn0: null, pn1: null, speed: 'normal', cpu: 'normal', name: '', sound: true, skins: [0, 1], mySkin: 0 };
   try { Object.assign(d, JSON.parse(localStorage.getItem('nyangBaseball') || '{}')); } catch (e) {}
   if (![1, 3, 5, 9].includes(d.winScore)) d.winScore = 3;
   d.pclock = d.pclock ? 1 : 0; d.hide = d.hide ? 1 : 0;
@@ -1503,6 +1528,13 @@ function hideIn(g, i, inp) {
   if (gi >= 0) o.g = i === 1 && g.phase === 'aim' ? NUMZ[gi] : gi;   // 2P 숫자패드: 공은 1~9 순서, 코스는 숫자패드 모양 그대로
   return o;
 }
+function toggleCam() {
+  const g = isOnline() ? RB && RB.G : G;
+  const nv = g && camStand(g) ? 'catcher' : 'stand';
+  if (mode === 'spec') Settings.camSpec = nv; else Settings.cam = nv;
+  saveSettings(); updSegs && updSegs();
+  toast(nv === 'stand' ? '🏟 관중석 시점: 경기장 전체가 보이고, 오른쪽 작은 화면에서 조준·타격해요' : '📺 중계 화면 (포수 뒤 시점)');
+}
 const inGame = () => ['cpu', 'local', 'host', 'guest', 'spec'].includes(mode);
 const isOnline = () => mode === 'host' || mode === 'guest';
 
@@ -1525,6 +1557,7 @@ addEventListener('keydown', e => {
   if (tk && !e.repeat) tacK[mode === 'local' ? (tm[1] === 'Numpad' ? 1 : 0) : mode === 'guest' ? 1 : 0] = +tm[2] - 1;   // 둘이서: 숫자줄 = 1P, 숫자패드 = 2P
   if (inGame() && (GAME_CODES.has(e.code) || hk || tk)) e.preventDefault();
   if ((e.code === 'Escape' || e.code === 'KeyP') && !e.repeat) togglePause();
+  if (e.code === 'KeyV' && !e.repeat && inGame() && !(G && G.derby && mode !== 'spec')) toggleCam();   // V: 관중석 시점 ↔ 중계 화면
 });
 addEventListener('keyup', e => { keys[e.code] = false; });
 addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
@@ -1984,7 +2017,7 @@ function drawHud(v) {
 }
 // 중계 화면처럼 오른쪽 아래에 볼·스트라이크·아웃과 주자
 function drawCount(v) {
-  const x = 404, y = 228;
+  const st = camStand(v) && !['field', 'rundown'].includes(v.phase), x = 404, y = st ? 41 : 228;   // 관중석 시점이면 오른쪽 위
   ctx.fillStyle = 'rgba(20,20,30,.72)'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y, 70, 52, 7) : ctx.rect(x, y, 70, 52); ctx.fill();
   dots(x + 12, y + 11, v.balls, 3, '#51cf66', 'B'); dots(x + 12, y + 25, v.strikes, 2, '#ffd43b', 'S'); dots(x + 12, y + 39, v.outs, 2, '#ff6b6b', 'O');
   mini(x + 55, y + 34, v.bases, 5.5);
@@ -2005,7 +2038,13 @@ function render(v, now, dt) {
   } else ctx.drawImage(bgCanvas, sx * k, sy * k);
   ctx.setTransform(k, 0, 0, k, sx * k, sy * k);
   if (!v) { outlined('연결 중…', HALF, 150, 26, '#fff', '#111'); return; }
-  if (v.phase === 'field' && v.fly) drawFieldPhase(v, now); else if (inPlay) drawPlay(v, now); else drawDuel(v, now);
+  if (v.phase === 'field' && v.fly) drawFieldPhase(v, now); else if (inPlay) drawPlay(v, now); else if (camStand(v)) drawStand(v, now); else drawDuel(v, now);
+  if (v.phase === 'result' && v.res && v.res.bench) drawBench(v, now);
+  else if (v.phase === 'result' && v.res && v.res.bq && mode !== 'demo' && (myTeam(v.bat) || mode === 'local')) {   // 맞은 팀: 버튼을 누르면 벤치 클리어링
+    const hk = touchUI() ? '큰 버튼' : mode === 'local' ? (v.bat === 0 ? 'F' : 'Enter') : 'Space';
+    ctx.fillStyle = 'rgba(20,20,30,.75)'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(HALF - 120, 176, 240, 26, 9) : ctx.rect(HALF - 120, 176, 240, 26); ctx.fill();
+    outlined(`😾 ${mode === 'local' ? Names[v.bat] + ': ' : ''}${hk} 누르면 벤치 클리어링! (한 경기에 1번)`, HALF, 189.5, 11, Math.floor(now / 300) % 2 ? '#ff8787' : '#fff', '#111');
+  }
   if (v.phase === 'rundown' && v.rd) drawRundown(v, now);
   if (mode === 'local' && touchUI() && !fieldV && v.phase !== 'over') {          // 둘이서 터치: 화면 왼쪽은 1P, 오른쪽은 2P
     ctx.strokeStyle = 'rgba(255,255,255,.12)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(HALF, 150); ctx.lineTo(HALF, 300); ctx.stroke(); ctx.setLineDash([]);
@@ -2047,7 +2086,7 @@ function render(v, now, dt) {
     if (S2.pitcher) outlined(`${pitName(S2.t, S2.from)} → ${pitName(S2.t, S2.to)} (${S2.hand ? '좌투' : '우투'}) 등판!`, HALF, 81, 9, '#fff', '#111');
     else outlined(`${S2.slot + 1}번 ${nameOf(S2.t, S2.from)} → ${nameOf(S2.t, S2.to)} ${ty.icon}${ty.name}`, HALF, 81, 9, '#fff', '#111');
   }
-  if (v.phase === 'result' && v.res) {
+  if (v.phase === 'result' && v.res && !(v.res.bench && ((v.res.BT || 0) - v.timer) > v.rate * 0.9)) {
     const R2 = v.res, big = R2.kind === 'hr' || R2.kind === 'triple' || R2.kind === 'double' || R2.kind === 'single' || R2.kind === 'k';
     const col = R2.kind === 'hr' ? '#ffe066' : R2.bases ? '#ffe066' : R2.out ? '#ffa8a8' : R2.kind === 'walk' || R2.kind === 'ball' || R2.kind === 'hbp' ? '#b2f2bb' : '#fff';
     const C = R2.T && !R2.varRes ? playClock(v) : { t: v.rate * 1.2 - v.timer, rep: 0 }, t = C.t, p = t < 0 ? 1 : Math.min(1, t / 10);
@@ -2088,8 +2127,9 @@ function render(v, now, dt) {
     if (M) { outlined(`🏅 MVP  ${nameOf(M.t, M.src)} (${Names[M.t]})`, HALF, 186, 13, '#fff', '#111'); outlined(statLine(M.S), HALF, 203, 10, '#ffe066', '#111'); }
     }
   }
-  if (mode === 'spec') outlined('👀 관전 중', W - 8, 44, 8, '#ffe066', '#111', 'right');
-  if (isOnline() && RB) outlined(`핑 ${Math.round(RB.rtt)}ms${Net.dcOpen ? ' ⚡' : ''}`, W - 8, 44, 7, '#fff', '#111', 'right');
+  const LX = camStand(v) && !fieldV ? 398 : W - 8;   // 관중석 시점이면 볼카운트 왼쪽에
+  if (mode === 'spec') outlined('👀 관전 중', LX, 44, 8, '#ffe066', '#111', 'right');
+  if (isOnline() && RB) outlined(`핑 ${Math.round(RB.rtt)}ms${Net.dcOpen ? ' ⚡' : ''}`, LX, 44, 7, '#fff', '#111', 'right');
   if (isOnline() && RB && RB.stallMs > 500) {
     ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(0, 0, W, H);
     outlined('상대 연결을 기다리는 중…', HALF, H / 2, 18, '#fff', '#1f2a44');
@@ -2099,8 +2139,9 @@ function render(v, now, dt) {
 const TAC_X0 = 98, TAC_Y = 57, TAC_W = 38, TAC_G = 3; let TAC_H = 13;   // 터치 화면에선 카드가 더 커요
 function showTac(v) { return v && (v.phase === 'select' || v.phase === 'aim') && !v.derby && !v.easy && mode !== 'demo' && mode !== 'spec' && (mode === 'local' || myTeam(v.bat !== undefined ? v.bat : v.half)); }
 function tacAt(p) { if (p.y < TAC_Y - 4 || p.y > TAC_Y + TAC_H + 4) return -1; const m = Math.floor((p.x - TAC_X0 + TAC_G / 2) / (TAC_W + TAC_G)); return m >= 0 && m < 7 ? m : -1; }
-function drawDuel(v, now) {
-  const pit = v.pit, bat = v.bat, bl = v.ball;
+function drawDuel(v, now, part) {
+  const pit = v.pit, bat = v.bat, bl = v.ball, S = part !== 'ui', U = part !== 'scene', STAND = !!part;   // part: 'scene'(투수·타자·존만) · 'ui'(카드·안내만) · 없으면 전부
+  if (S) {
   // 투수
   let arm = 0.1;
   if (v.phase === 'pitch' && bl) arm = Math.min(1, 0.3 + bl.f / 8);
@@ -2158,11 +2199,12 @@ function drawDuel(v, now) {
     }
     // 타이밍 알림 (쉬운 난이도): 줄어드는 고리가 노란 원과 같아질 때 스윙!
     if (v.phase === 'pitch' && v.assist[bat] > 0 && v.swing < 0 && v.bmode !== 1) {
-      const ideal = bl.t - SWING_HIT, left = ideal - bl.f, rr2 = v.hitR[bat] * ZW;
-      if (left > -4 && left < 30) {
-        const good = Math.abs(left) <= 3;
+      // 공이 출발할 때부터 천천히 줄어들어요 · '지금!'은 사람이 보고 누르는 시간(약 0.15초)만큼 일찍 떠요
+      const ideal = bl.t - SWING_HIT, left = ideal - bl.f, rr2 = v.hitR[bat] * ZW, k = (v.rate || 60) / 60, span = Math.max(20, ideal);
+      if (left > -4 * k) {
+        const good = left <= 9 * k && left >= -3 * k;
         ctx.strokeStyle = good ? '#69db7c' : 'rgba(255,255,255,.8)'; ctx.lineWidth = good ? 3 : 1.6;
-        ctx.beginPath(); ctx.arc(zx(v.cu), zy(v.cv), rr2 + Math.max(0, left) * 2.2, 0, 7); ctx.stroke();
+        ctx.beginPath(); ctx.arc(zx(v.cu), zy(v.cv), rr2 + Math.max(0, left) / span * 60, 0, 7); ctx.stroke();
         if (good) outlined('지금!', zx(v.cu), zy(v.cv) - rr2 - 10, 12, '#69db7c', '#111');
       }
     }
@@ -2192,8 +2234,11 @@ function drawDuel(v, now) {
     if (drop === 2 && dt2 > 0.9) outlined('아웃!', 420, 168, 12, '#ff8787', '#111');
   } else
   drawCat(lefty ? 280 : 200, 268, 1.45, pSkin(bat, bsrc), bat, { bat: batA, bunt: v.bmode === 1, num: pNum(bat, bsrc, v.bo[bat]), face: lefty ? -1 : 1 });
-  // 지금 타자 (중계 화면 자막처럼)
-  {
+  }
+  const bty = v.lu[bat][v.bo[bat]], bh = v.hand[bat][v.bo[bat]];
+  // 지금 타자 (중계 화면 자막처럼) — 관중석 시점이면 왼쪽 위
+  if (U) {
+    const SBX = STAND ? 4 : 96, SBY = STAND ? 72 : 190; ctx.save(); ctx.translate(SBX - 96, SBY - 190);
     const nm = nameOf(bat, v.src[bat][v.bo[bat]]), B = BTYPES[bty];
     ctx.fillStyle = 'rgba(20,20,30,.72)'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(96, 190, 86, 30, 7) : ctx.rect(96, 190, 86, 30); ctx.fill();
     ctx.fillStyle = TEAM_COL[bat]; ctx.fillRect(96, 190, 4, 30);
@@ -2207,6 +2252,7 @@ function drawDuel(v, now) {
       outlined('체력', 158, 234, 6, '#dee2e6', '#111', 'left');
       if (fatigue(v, pit) > 0.2 && v.phase === 'select' && v.pst[pit].length <= MAXRP && ((myTeam(pit) && mode !== 'demo') || mode === 'local')) outlined('😓 투수가 지쳤어요 → 🔄 교체', 104, 244, 7.5, '#ffa8a8', '#111', 'left');
     }
+    ctx.restore();
   }
   // 작전 표시 (번트 자세는 누구나 보이고, 도루는 공격하는 쪽만)
   // (번트 자세는 누구나, 뛰는 작전은 공격 쪽만 · 공을 던지면 주자가 뛰는 게 모두에게 보여요 · 비밀 모드에선 바꾼 순간만 잠깐)
@@ -2214,7 +2260,7 @@ function drawDuel(v, now) {
   const started = v.phase === 'pitch' && bl && bl.f > 6, hid = mode === 'local' && hideOn() && !started && v.bmode !== 1;
   { const key = v.pitchN + '/' + v.bmode; if (R.bmKey !== key) { if (R.bmKey && R.bmKey.split('/')[0] === String(v.pitchN)) R.bmT = now; R.bmKey = key; } }
   const peek = now - (R.bmT || -1e9) < 700;
-  if (hid && (v.phase === 'select' || v.phase === 'aim') && v.bases.some(x => x) && !v.derby && !v.easy) {
+  if (!S) {} else if (hid && (v.phase === 'select' || v.phase === 'aim') && v.bases.some(x => x) && !v.derby && !v.easy) {
     ctx.fillStyle = 'rgba(99,230,190,.9)'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(146, 168, 70, 16, 6) : ctx.rect(146, 168, 70, 16); ctx.fill();
     outlined(peek && v.bmode ? BM_TXT[v.bmode] : peek ? '강공' : '🤫 작전 비밀', 181, 176.5, 8.5, '#111', '#fff');
   } else if (v.bmode === 1 || (v.bmode >= 2 && (myTeam(bat) || mode === 'local' || started))) {
@@ -2223,7 +2269,7 @@ function drawDuel(v, now) {
     outlined(started && v.bmode >= 2 ? (v.bmode === 6 ? '🏠 3루 주자 홈으로!' : '🏃 주자 스타트!') : BM_TXT[v.bmode], 181, 176.5, 8.5, '#111', '#fff');
   }
   // 작전 카드 (위쪽 한 줄): 숫자 1~7 키나 톡으로 바로 골라요
-  if (showTac(v)) {
+  if (U && showTac(v)) {
     TAC_H = touchUI() ? 20 : 13;
     const TL = ['강공', '번트', '도루', '런앤히트', '히트앤런', '더블스틸', '홈스틸'], secret = hid && !peek;
     for (let m = 0; m < 7; m++) {
@@ -2237,7 +2283,7 @@ function drawDuel(v, now) {
     ctx.globalAlpha = 1;
   }
   // 수비 위치 (왼쪽): 투수가 고르는 중이면 목록, 아니면 지금 수비 + 작은 지도
-  {
+  if (U) {
     const me = (myTeam(pit) && mode !== 'demo') || mode === 'local', dsel = v.def[pit];
     if (v.phase === 'select' && me && !v.derby && !v.easy) {
       outlined('수비 위치 ↑↓', 42, 104, 8.5, '#fff', '#111');
@@ -2248,15 +2294,17 @@ function drawDuel(v, now) {
         outlined(D.name, x + 35, y + 9, 8.5, on ? '#111' : '#fff', on ? '#fff' : '#111');
       });
     }
-    // 작은 수비 지도
+    // 작은 수비 지도 (관중석 시점이면 경기장이 다 보여서 안 그려요)
+    if (!STAND) {
     const mx = 42, my = 280, k2 = 0.085;
     ctx.fillStyle = 'rgba(20,20,30,.6)'; ctx.beginPath(); ctx.moveTo(mx, my + 4); ctx.lineTo(mx - 34, my - 32); ctx.arc(mx, my, 48, -Math.PI * 0.75, -Math.PI * 0.25); ctx.closePath(); ctx.fill();
     ctx.fillStyle = 'rgba(217,160,102,.8)'; ctx.beginPath(); ctx.moveTo(mx, my); ctx.lineTo(mx + 8, my - 8); ctx.lineTo(mx, my - 16); ctx.lineTo(mx - 8, my - 8); ctx.closePath(); ctx.fill();
     for (const [a, r] of fielders(dsel)) { const p = polar(a, r); ell(mx + p[0] * k2, my + p[1] * k2 * 1.25, 2, 2, TEAM_COL[pit]); }
     outlined(DEFS[dsel].name, mx, my - 56, 7.5, '#63e6be', '#111');
+    }
   }
   // 구종 고르기 카드
-  if ((v.phase === 'select' || v.phase === 'aim') && !v.derby) {
+  if (U && (v.phase === 'select' || v.phase === 'aim') && !v.derby) {
     const me = myTeam(pit) && mode !== 'demo';
     const show = me || mode === 'local';
     const PO2 = pitchOpts(v), stp = cardStep(PO2.length), hk2 = mode === 'local' && hideOn() ? HKEY_LBL[pit] : '';
@@ -2267,10 +2315,11 @@ function drawDuel(v, now) {
       outlined(v.easy ? EASY_PN[pv] || PITCHES[pv].name : pv < NP ? PITCHES[pv].name : XPITCH[pv - NP], x + 34, y + (stp - 2) / 2 + 0.5, 8.5, on ? '#111' : '#fff', on ? '#fff' : '#111');
       if (hk2 && i < 9) outlined(hk2[i], x - 7, y + (stp - 2) / 2 + 0.5, 9, '#ffe066', '#111');
     });
-    if (hk2 && v.phase === 'aim') for (let g = 0; g < 9; g++) outlined(HZONE_LBL[pit][g], zx(((g % 3) - 1) * 0.85), zy((Math.floor(g / 3) - 1) * 0.85), 9, 'rgba(255,255,255,.55)', 'rgba(0,0,0,.4)');
+    if (hk2 && v.phase === 'aim' && !STAND) for (let g = 0; g < 9; g++) outlined(HZONE_LBL[pit][g], zx(((g % 3) - 1) * 0.85), zy((Math.floor(g / 3) - 1) * 0.85), 9, 'rgba(255,255,255,.55)', 'rgba(0,0,0,.4)');
   }
-  if ((v.phase === 'select' || v.phase === 'aim') && v.pclock && !v.derby) { const sec = Math.ceil(v.pc / v.rate); outlined(`⏱ ${sec}`, 398, 240, 11, sec <= 5 ? (Math.floor(now / 250) % 2 ? '#ff6b6b' : '#fff') : '#fff', '#111', 'right'); outlined('피치클락', 398, 252, 6.5, '#dee2e6', '#111', 'right'); }
+  if (U && (v.phase === 'select' || v.phase === 'aim') && v.pclock && !v.derby) { const sec = Math.ceil(v.pc / v.rate), PX2 = STAND ? 284 : 398, PY2 = STAND ? 236 : 240; outlined(`⏱ ${sec}`, PX2, PY2, 11, sec <= 5 ? (Math.floor(now / 250) % 2 ? '#ff6b6b' : '#fff') : '#fff', '#111', 'right'); outlined('피치클락', PX2, PY2 + 12, 6.5, '#dee2e6', '#111', 'right'); }
   // 아래 안내
+  if (!U) return;
   let msg = '';
   const hk = t => touchUI() ? '화면 톡(또는 큰 버튼)' : mode === 'local' ? (t === 0 ? 'F' : 'Enter') : 'Space';
   const mv = t => touchUI() ? '화면 문지르기' : mode === 'local' ? (t === 0 ? 'WASD' : '방향키') : '방향키';
@@ -2391,6 +2440,90 @@ function drawCeremony(v, Rr, t, now) {
   opt.face = face; drawCat(x, y + dy, 1.5, pSkin(v.bat, src), v.bat, opt);
   outlined(CERS[c] || CERS[0], 62, 206, 9, '#ffe066', '#111');
 }
+// ===== 관중석 시점: 홈플레이트 뒤 관중석에서 경기장 전체를 내려다봐요 (오른쪽 작은 화면 = 중계 클로즈업) =====
+const PIP = { x: 290, y: 96, w: 186, h: 184, s: 0.82 };
+PIP.sx = 240 - PIP.w / 2 / PIP.s; PIP.sy = 302 - PIP.h / PIP.s;
+const STAND_H = [146, 256], STAND_K = 0.9;
+function camStand(v) { return !!v && !v.tut && (mode === 'spec' ? Settings.camSpec !== 'catcher' : Settings.cam === 'stand'); }   // 관전할 때는 처음부터 관중석 시점
+function drawStand(v, now) {
+  if (R.fieldKey !== cv.width + '/' + v.fence) { buildField(v.fence); R.fieldKey = cv.width + '/' + v.fence; }
+  const pit = v.pit, bat = v.bat, bl = v.ball, TH = PARK_TH[(PARKS[v.park | 0] || PARKS[0]).th] || PARK_TH[0];
+  // 바깥 관중석 (경기장 뒤로 빙 둘러)
+  ctx.fillStyle = TH.stand; ctx.fillRect(0, 36, W, H - 36);
+  const rnd2 = seeded(31);
+  for (let i = 0; i < 260; i++) { const x = rnd2() * W, y = 36 + rnd2() * 110; ctx.fillStyle = `hsla(${rnd2() * 360},55%,70%,.55)`; ctx.beginPath(); ctx.arc(x, y + Math.sin(now / 300 + i) * 0.6, 1.4 + rnd2() * 1.2, 0, 7); ctx.fill(); }
+  // 경기장 (위에서 비스듬히)
+  ctx.save(); ctx.translate(STAND_H[0], STAND_H[1]); ctx.scale(STAND_K, STAND_K); ctx.translate(-HOME[0], -HOME[1]);
+  ctx.save(); ctx.beginPath(); ctx.rect(-200, 36 / STAND_K, W + 400, H); ctx.clip();
+  ctx.drawImage(fieldCanvas, 0, 0, W, H);
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(255,255,255,.4)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(HOME[0], HOME[1]); ctx.lineTo(...fpos(-45, 150)); ctx.moveTo(HOME[0], HOME[1]); ctx.lineTo(...fpos(45, 150)); ctx.stroke();
+  // 수비수 9명 · 주자 · 타자
+  const fld = fielders(v.def[pit]);
+  fld.forEach((p, i) => { const q = fpos(p[0], p[1]); drawCat(q[0], q[1] + 6, 0.5, skinOf(pit), pit, { glove: 1, num: String(i + 1), arm: i === 0 && v.phase === 'pitch' && bl ? Math.min(1, 0.3 + bl.f / 8) : 0.1 }); });
+  v.bases.forEach((on, i) => { if (on) { const p = BASE_P[i + 1], sc = v.src[bat][on - 1], lead = v.phase === 'pitch' && v.bmode >= 2 && bl && bl.f > 6 ? Math.min(1, bl.f / bl.t) * 0.5 : 0, p2 = BASE_P[i + 2] || BASE_P[4]; drawCat(p[0] + (p2[0] - p[0]) * lead, p[1] + (p2[1] - p[1]) * lead + 6, 0.55, pSkin(bat, sc), bat, { num: pNum(bat, sc, on - 1), run: lead ? now / 50 : 0 }); } });
+  const bh = v.hand[bat][v.bo[bat]], lefty = bh === 2 ? v.phand[pit] === 0 : bh === 1, bsrc = v.src[bat][v.bo[bat]];
+  let batA = 0; if (v.swing >= 0 && bl) batA = Math.min(1, Math.max(0, (bl.f - v.swing) / SWING_T));
+  drawCat(HOME[0] + (lefty ? 9 : -9), HOME[1] + 4, 0.6, pSkin(bat, bsrc), bat, { bat: batA, bunt: v.bmode === 1, num: pNum(bat, bsrc, v.bo[bat]), face: lefty ? -1 : 1 });
+  // 공: 마운드 → 홈플레이트
+  if (bl && (v.phase === 'pitch' || (v.phase === 'result' && v.res && !v.res.bases && !v.res.out))) {
+    const s0 = Math.min(bl.f / bl.t, 1.25), M = fpos(0, 58), k = Math.min(1, s0), x = M[0] + (HOME[0] - M[0]) * k, y = M[1] + (HOME[1] + 6 - M[1]) * k + (s0 > 1 ? (s0 - 1) * 20 : 0), hg = Math.sin(k * Math.PI) * 5 + 6 * (1 - k);
+    ell(x, y + 1, 1.8, 1, 'rgba(0,0,0,.3)'); drawBall(x, y - hg, 2.2, bl.f * 0.3);
+  }
+  ctx.restore();
+  // 앞쪽 관중석 (뒷모습): 우리가 앉아 있는 자리
+  const rnd3 = seeded(77);
+  ctx.fillStyle = 'rgba(30,30,40,.55)'; ctx.fillRect(0, 266, 292, 34);
+  for (let row = 0; row < 2; row++) for (let i = 0; i < 13; i++) {
+    const x = 8 + i * 22 + row * 11 + rnd3() * 4, y = 286 + row * 12 - Math.abs(Math.sin(now / 260 + i * 1.7 + row)) * (v.phase === 'result' ? 4 : 1.2), sk = SKINS[Math.floor(rnd3() * SKINS.length)];
+    ctx.fillStyle = sk.main; ctx.strokeStyle = sk.line; ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(x - 7, y - 4); ctx.lineTo(x - 6, y - 13); ctx.lineTo(x - 1.5, y - 8); ctx.lineTo(x + 1.5, y - 8); ctx.lineTo(x + 6, y - 13); ctx.lineTo(x + 7, y - 4); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ell(x, y - 2, 8, 7, sk.main); ctx.stroke();
+    if (rnd3() < 0.35) { ctx.fillStyle = TEAM_COL[rnd3() < 0.5 ? 0 : 1]; ctx.fillRect(x - 6, y - 15, 12, 3); }   // 응원 모자
+  }
+  outlined('🏟 관중석 시점 · V키(또는 위쪽 📺 버튼)로 중계 화면', 6, 262, 7, '#fff', '#111', 'left');
+  // 오른쪽 작은 화면: 중계 클로즈업 (조준·타격은 여기서 해요)
+  ctx.save();
+  ctx.beginPath(); ctx.roundRect ? ctx.roundRect(PIP.x, PIP.y, PIP.w, PIP.h, 10) : ctx.rect(PIP.x, PIP.y, PIP.w, PIP.h); ctx.clip();
+  ctx.translate(PIP.x - PIP.sx * PIP.s, PIP.y - PIP.sy * PIP.s); ctx.scale(PIP.s, PIP.s);
+  ctx.drawImage(bgCanvas, 0, 0, W, H);
+  drawDuel(v, now, 'scene');
+  ctx.restore();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(PIP.x, PIP.y, PIP.w, PIP.h, 10) : ctx.rect(PIP.x, PIP.y, PIP.w, PIP.h); ctx.stroke();
+  outlined('📺 중계 화면', PIP.x + 8, PIP.y + 9, 7.5, '#fff', '#111', 'left');
+  if (v.phase === 'pitch' && bl && bl.f < 16) outlined(bl.po ? '피치아웃!' : `${bl.kmh}km ${PITCHES[bl.type].name}`, PIP.x + PIP.w - 8, PIP.y + 9, 8, '#ffe066', '#111', 'right');
+  drawDuel(v, now, 'ui');
+}
+// 관중석 시점일 때 마우스·손가락 위치를 작은 화면(중계 화면) 안의 자리로 바꿔요
+function standPt(p, g) { if (!g || !camStand(g) || !['select', 'aim', 'pitch'].includes(g.phase)) return p; return { x: PIP.sx + (p.x - PIP.x) / PIP.s, y: PIP.sy + (p.y - PIP.y) / PIP.s }; }
+// ===== 벤치 클리어링: 몸에 맞는 공 뒤에 양 팀 선수들이 우르르! → 심판 호루라기 → 화해 =====
+function drawBench(v, now) {
+  const Rr = v.res, t = 0.5 + ((Rr.BT || v.rate * 5.8) - v.timer) / v.rate;   // 버튼을 누른 뒤 지난 시간 (초)
+  if (t < 0.5 || t > 6.3) return;
+  const pit = v.pit, bat = v.bat, cxp = 240, cyp = 230, n = 7;
+  const run = Math.min(1, (t - 0.5) / 1.1), back = t > 5.4 ? Math.min(1, (t - 5.4) / 0.8) : 0, calm = t > 3.3;
+  ctx.fillStyle = `rgba(0,0,0,${0.25 * (1 - back)})`; ctx.fillRect(0, 36, W, H - 36);
+  for (const tm of [0, 1]) {
+    const side = tm === bat ? -1 : 1;                                      // 공격 팀은 왼쪽(1루 쪽 반대)에서, 수비 팀은 오른쪽에서
+    for (let i = 0; i < n; i++) {
+      const sx0 = side < 0 ? -30 - i * 14 : W + 30 + i * 14, sy0 = 200 + (i % 3) * 22;
+      const tx = cxp + side * (18 + (i % 4) * 16) + (calm ? 0 : Math.sin(now / 90 + i * 2) * 4), ty = cyp - 30 + (i % 3) * 26 + Math.floor(i / 3) * 6;
+      const k = run * (1 - back), x = sx0 + (tx - sx0) * k, y = sy0 + (ty - sy0) * k;
+      drawCat(x, y, 0.85, skinOf(tm), tm, { run: (k > 0 && k < 1) || (!calm && t > 1.6) ? now / 50 + i : 0, face: side < 0 ? 1 : -1 });
+      if (calm && t > 3.9 && t < 5.4 && i === 0) outlined(tm === pit ? '미안해~ 일부러 그런 거 아니야 🙇' : '괜찮아! 조심해 줘 👍', x + (side < 0 ? -10 : 10), y - 36, 8.5, '#fff', '#111', side < 0 ? 'right' : 'left');
+    }
+  }
+  if (t > 1.5 && !calm) {                                                // 와글와글 흙먼지
+    for (let i = 0; i < 9; i++) { const a = i * 0.7 + now / 300, r = 26 + (i % 3) * 10; ell(cxp + Math.cos(a) * r * 1.4, cyp + Math.sin(a) * r * 0.5, 16, 10, 'rgba(230,200,150,.55)'); }
+    for (let i = 0; i < 5; i++) { const a = now / 200 + i * 1.3; outlined(['💢', '❗', '💨', '⭐', '❓'][i], cxp + Math.cos(a) * 50, cyp - 20 + Math.sin(a * 1.3) * 22, 12, '#fff', '#111'); }
+    outlined('와글와글!', cxp, 100, 18, '#ffe066', '#111');
+  }
+  if (t > 2.8 && t < 5.6) {                                              // 심판 등장
+    drawCat(cxp, cyp - 6, 1, SKINS[2], 0, { face: 1 });
+    outlined(t < 3.7 ? '🧑‍⚖️ 삐익~! 그만! 🫷' : '🤝 서로 사과하고 화해!', cxp, 100, t < 3.7 ? 17 : 15, t < 3.7 ? '#ff8787' : '#8ce99a', '#111');
+  }
+  if (t > 4.5 && t < 5.6) outlined('👏 스포츠맨십 최고!', cxp, 122, 12, '#ffe066', '#111');
+}
 
 /* ================= 효과음 (되감기해도 두 번 나지 않게) ================= */
 let fxSeen = null;
@@ -2410,6 +2543,7 @@ function syncFx(fx) {
   if (up('change')) { Sound.whistle(); Music.song('ballgame', true); }
   if (up('dp')) { Sound.ump(); Sound.mitt(); shake = Math.max(shake, 4); }
   if (up('whistle')) Sound.whistle();
+  if (up('bench')) { Sound.noise(1.6, 0.18, 900); setTimeout(() => Sound.whistle(), 2400); }   // 와글와글 → 삐익
   if (up('var')) { Sound.whistle(); Music.cheer(0.5, 3); }
   if (up('win')) { Sound.win(); Music.song('win', true); }
 }
@@ -2431,7 +2565,7 @@ function startDemo() {
 }
 function setSkins(n) { Skins = Settings.skins.slice(0, 2); Names = [teamName(0), teamName(1)]; Logos = [Settings.logo0 | 0, Settings.logo1 | 0]; PNames = [Settings.pn0.slice(), Settings.pn1.slice()]; BNames = [Settings.bpn0.slice(), Settings.bpn1.slice()]; PCol = [Settings.pcol0.slice(), Settings.pcol1.slice()]; PNum = [Settings.pnum0.slice(), Settings.pnum1.slice()]; Mgrs = [String(Settings.mgr0 || ''), String(Settings.mgr1 || '')]; LStyles = [Settings.lsty0 | 0, Settings.lsty1 | 0]; PitNames = [Settings.ppn0.slice(), Settings.ppn1.slice()]; PCer = [Settings.cer0.slice(), Settings.cer1.slice()]; PSong = [Settings.sng0.slice(), Settings.sng1.slice()]; applyCols(Settings.tcol0, Settings.tcol1); }
 let PNames = [[], []], BNames = [[], []];
-const gameOpt = kind => ({ lu0: luEncode(Settings.lu0), lu1: luEncode(Settings.lu1), bn0: luEncode(Settings.bn0), bn1: luEncode(Settings.bn1), diff0: Settings.bdiff, diff1: kind === 'cpu' ? ({ veasy: 3, easy: 2, normal: 2, hard: 1 }[Settings.cpu] ?? 2) : Settings.bdiff, bspd: Settings.bspd | 0, park: Settings.park | 0, rp0: rphBits(Settings.rph0), rp1: rphBits(Settings.rph1), cat0: Settings.cat0 | 0, cat1: Settings.cat1 | 0, wx: Settings.wx | 0, easy: Settings.easy ? 1 : 0, pr0: prepEncode(Settings.prep0), pr1: prepEncode(Settings.prep1), pf0: handEncode(Settings.pform0), pf1: handEncode(Settings.pform1), bh0: handEncode(Settings.bh0), bh1: handEncode(Settings.bh1), bbh0: handEncode(Settings.bbh0), bbh1: handEncode(Settings.bbh1), ph0: Settings.ph0 | 0, ph1: Settings.ph1 | 0, pc: Settings.pclock ? 1 : 0 });
+const gameOpt = kind => ({ lu0: luEncode(Settings.lu0), lu1: luEncode(Settings.lu1), bn0: luEncode(Settings.bn0), bn1: luEncode(Settings.bn1), diff0: Settings.bdiff, diff1: kind === 'cpu' ? ({ veasy: 3, easy: 2, normal: 2, hard: 1 }[Settings.cpu] ?? 2) : Settings.bdiff, bspd: Settings.bspd | 0, park: Settings.park | 0, rp0: rphBits(Settings.rph0), rp1: rphBits(Settings.rph1), cat0: Settings.cat0 | 0, cat1: Settings.cat1 | 0, wx: Settings.wx | 0, easy: Settings.easy ? 1 : 0, pr0: prepEncode(Settings.prep0), pr1: prepEncode(Settings.prep1), pf0: handEncode(Settings.pform0), pf1: handEncode(Settings.pform1), bh0: handEncode(Settings.bh0), bh1: handEncode(Settings.bh1), bbh0: handEncode(Settings.bbh0), bbh1: handEncode(Settings.bbh1), ph0: Settings.ph0 | 0, ph1: Settings.ph1 | 0, pc: Settings.pclock ? 1 : 0, bc: Settings.bclear === 0 ? 0 : 1 });
 const teamName = i => (String(Settings['team' + i] || '').trim() || ['치즈 타이거즈', '블루 라이언즈'][i]).slice(0, 8);
 let series = [0, 0], lastKind = null, lastN = 2;   // 연속 경기 전적, 마지막으로 한 모드
 function startGame(kind, cont) {
@@ -2771,7 +2905,8 @@ cv.addEventListener('pointermove', e => {
     const D = ptr.drag; if (Math.hypot(p.x - D.sx, p.y - D.sy) > 2) D.moved = 1;
     ptr.x = D.bx + (p.x - D.sx) * 1.7; ptr.y = D.by + (p.y - D.sy) * 1.7; ptr.on = true; return;
   }
-  if (Math.hypot(p.x - ptr.x, p.y - ptr.y) > 1.5) ptr.on = true; ptr.x = p.x; ptr.y = p.y;
+  const q2 = standPt(p, isOnline() ? RB && RB.G : G);
+  if (Math.hypot(q2.x - ptr.x, q2.y - ptr.y) > 1.5) ptr.on = true; ptr.x = q2.x; ptr.y = q2.y;
 });
 ['pointerup', 'pointercancel'].forEach(ev => cv.addEventListener(ev, e => {
   const ptr = ptrFor(e, toLogical(e)), D = ptr.drag; ptr.drag = null; ptrOwn.delete(e.pointerId);
@@ -2787,7 +2922,7 @@ cv.addEventListener('pointerdown', e => {
   if (mode === 'local' && g) who = card || dcard || g.phase === 'field' ? pitTeam(g) : p.x < HALF ? 0 : 1;
   if (mode === 'local') ptrOwn.set(e.pointerId, who);
   const ptr = mode === 'local' ? PT[who] : PT[0];
-  ptr.x = p.x; ptr.y = p.y; ptr.on = true; ptr.t = performance.now();
+  { const q2 = standPt(p, g); ptr.x = q2.x; ptr.y = q2.y; } ptr.on = true; ptr.t = performance.now();
   if (card) ptr.card = po[Math.floor((p.y - 100) / st)];
   else if (dcard) ptr.dcard = Math.floor((p.y - 112) / 21);
   else if (e.pointerType === 'touch' && g && g.phase !== 'field' && g.phase !== 'rundown') {
@@ -3200,6 +3335,7 @@ function checkRemoteCheer() {
 function updHitLabel(v) {
   const vb = $('#hud-var'); if (vb) { const c = v.close, on = inGame() && v.phase === 'result' && c && !c.used && v.chal[c.t] > 0 && myTeam(c.t) && mode !== 'demo' && !$('.screen.show') && !cmdQ[c.t].includes(14); vb.style.display = on ? 'block' : 'none'; if (on) vb.textContent = `📺 비디오 판독 요청 (${v.chal[c.t]}번 남음)${mode === 'local' ? ' · ' + Names[c.t] : ''}`; }
   const cb = $('#hud-cheer'); if (cb) cb.style.display = inGame() && mode !== 'demo' && !$('.screen.show') ? 'block' : 'none';
+  const cmb = $('#hud-cam'); if (cmb) { cmb.style.display = inGame() && mode !== 'demo' && !$('.screen.show') && !v.derby ? 'block' : 'none'; cmb.textContent = camStand(v) ? '📺' : '🏟'; cmb.title = camStand(v) ? '중계 화면으로 (V)' : '관중석 시점으로 (V)'; }
   const sb = $('#hud-sub'); if (sb) { const on = inGame() && v.phase === 'select' && subTeams(v).length > 0 && !$('.screen.show'); sb.style.display = on ? 'block' : 'none'; }
   const lab = i => { const pit = v.pit === i; if (pit) return v.phase === 'select' ? '결정' : v.phase === 'aim' ? '던지기' : v.phase === 'field' ? '수비' : '투수'; return v.phase === 'pitch' ? '스윙!' : '타자'; };
   const t = lab(0) + lab(1) + (mode === 'guest' ? 'g' : '');
@@ -3229,7 +3365,7 @@ function getName() {
 }
 function makeMatch() {
   const rate = RATES[Settings.speed] || 60;
-  return { id: (Date.now() % 1e9) + Math.floor(Math.random() * 1000), seed: newSeed(), rate, len: Settings.winScore, lu0: Net.lus[0] | 0, lu1: Net.lus[1] | 0, bn0: Net.bns[0] | 0, bn1: Net.bns[1] | 0, bh0: Net.bhs[0] | 0, bh1: Net.bhs[1] | 0, bbh0: Net.bbhs[0] | 0, bbh1: Net.bbhs[1] | 0, ph0: Net.phs[0] | 0, ph1: Net.phs[1] | 0, bd: Settings.bdiff | 0, bs: Settings.bspd | 0, pk: Settings.park | 0, rp0: Net.rphs ? Net.rphs[0] | 0 : 9, rp1: Net.rphs ? Net.rphs[1] | 0 : 9, cat0: Net.cats ? Net.cats[0] | 0 : 7, cat1: Net.cats ? Net.cats[1] | 0 : 7, wx: Settings.wx | 0, ez: Settings.easy ? 1 : 0, pc: Settings.pclock ? 1 : 0, pr0: Net.preps ? Net.preps[0] : 0, pr1: Net.preps ? Net.preps[1] : 0, pf0: Net.pforms ? Net.pforms[0] : 0, pf1: Net.pforms ? Net.pforms[1] : 0,
+  return { id: (Date.now() % 1e9) + Math.floor(Math.random() * 1000), seed: newSeed(), rate, len: Settings.winScore, lu0: Net.lus[0] | 0, lu1: Net.lus[1] | 0, bn0: Net.bns[0] | 0, bn1: Net.bns[1] | 0, bh0: Net.bhs[0] | 0, bh1: Net.bhs[1] | 0, bbh0: Net.bbhs[0] | 0, bbh1: Net.bbhs[1] | 0, ph0: Net.phs[0] | 0, ph1: Net.phs[1] | 0, bd: Settings.bdiff | 0, bs: Settings.bspd | 0, pk: Settings.park | 0, rp0: Net.rphs ? Net.rphs[0] | 0 : 9, rp1: Net.rphs ? Net.rphs[1] | 0 : 9, cat0: Net.cats ? Net.cats[0] | 0 : 7, cat1: Net.cats ? Net.cats[1] | 0 : 7, wx: Settings.wx | 0, ez: Settings.easy ? 1 : 0, pc: Settings.pclock ? 1 : 0, bc: Settings.bclear === 0 ? 0 : 1, pr0: Net.preps ? Net.preps[0] : 0, pr1: Net.preps ? Net.preps[1] : 0, pf0: Net.pforms ? Net.pforms[0] : 0, pf1: Net.pforms ? Net.pforms[1] : 0,
            delay: Math.max(1, Math.round(rate * 0.05)), maxRoll: Math.round(rate * 0.6) };
 }
 const cleanNm = (s, d) => maskBad(String(s || '')).hit ? d : s;
@@ -3697,6 +3833,8 @@ const actions = {
   saveimg: () => { if (lastOverView) downloadCanvas(resultCard(lastOverView), `냥냥야구_${String(Names[0]).replace(' 🤖', '')}_vs_${String(Names[1]).replace(' 🤖', '')}.png`); },
   lgimg: () => downloadCanvas(standingsCard(), '냥냥야구_리그순위.png'),
   cheerclose: () => showScreen(null),
+  watch: () => { showScreen('online'); const c = $('#in-code'); c.focus(); toast('👀 친구에게 방 코드 4글자를 받아 넣고 [👀 관전]을 누르세요 (여러 명이 같이 볼 수 있어요)'); },
+  cam: () => toggleCam(),
   sub: () => openSub(),
   subclose: () => { showScreen(null); if (!isOnline()) paused = false; },
   team: () => { LeagueEdit = null; updLeagueEdit(); buildTeamScreen(); updTypeCaps(0); updTypeCaps(1); drawCrests(); showScreen('team'); },
@@ -3729,7 +3867,7 @@ document.addEventListener('click', e => {
   const seg = e.target.closest('.seg button');
   if (seg) {
     const key = seg.parentElement.dataset.set;
-    Settings[key] = key === 'winScore' || key === 'bdiff' || key === 'bspd' || key === 'park' || key === 'wx' || key === 'easy' || key === 'pclock' || key === 'hide' ? +seg.dataset.v : seg.dataset.v;
+    Settings[key] = key === 'winScore' || key === 'bdiff' || key === 'bspd' || key === 'park' || key === 'wx' || key === 'easy' || key === 'pclock' || key === 'hide' || key === 'bclear' ? +seg.dataset.v : seg.dataset.v;
     saveSettings(); updSegs(); updContinue();
     if (Net.role === 'host') updateRoomUI();
     return;
