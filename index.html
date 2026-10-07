@@ -142,6 +142,11 @@ body{background:linear-gradient(160deg,#5c2e0e,#8a4a1c 60%,#a85d25)}
 .pchips{display:flex;flex-wrap:wrap;gap:3px;margin:2px 0 2px 48px}
 .pchips .pc{font:inherit;font-size:11.5px;padding:2px 6px;border-radius:8px;border:1.5px solid #e9d7b5;background:#fff;color:#a08560;cursor:pointer}
 .pchips .pc.on{background:#ffd43b;border-color:#f08c00;color:#3b2f1e;font-weight:bold}
+#hud-ibb{position:absolute;top:21%;right:1.6%;border:2px solid #b2f2bb;background:rgba(40,20,80,.8);color:#fff;border-radius:10px;font-size:13px;padding:3px 9px;cursor:pointer;font-family:inherit;display:none;box-shadow:0 2px 0 rgba(0,0,0,.35);z-index:4}
+#hud-ibb.q{background:#b2f2bb;color:#111;animation:ibbq .5s infinite alternate}
+@keyframes ibbq{to{transform:scale(1.07)}}
+@media (max-width:520px),(max-height:500px){#hud-ibb{font-size:10px;padding:2px 6px}}
+body.smallst #hud-ibb{right:40px!important;top:calc(var(--sc,1)*78px)!important}
 #hud-var{position:absolute;top:44%;left:50%;transform:translateX(-50%);border:3px solid #ffd43b;background:#212529;color:#ffe066;border-radius:14px;font-size:18px;padding:6px 16px;cursor:pointer;font-family:inherit;display:none;box-shadow:0 4px 0 rgba(0,0,0,.35);z-index:5}
 @media (max-width:520px),(max-height:500px){#hud-var{font-size:13px;padding:3px 10px}}
 .parksel{font:inherit;font-size:15px;border:2px solid #f0dcb6;border-radius:12px;padding:6px 8px;background:#f5e6cc;color:#6b5330;width:100%;min-width:0}
@@ -222,6 +227,7 @@ table.keys td,table.keys th{white-space:nowrap}
     <button id="hud-menu" data-act="hud">⏸ 메뉴</button>
     <div id="tut-box" style="display:none"></div>
     <button id="hud-var" data-act="var">📺 비디오 판독 요청</button>
+    <button id="hud-ibb" data-act="ibb" title="고의사구 (I)">🙅 고의사구</button>
     <button id="hud-cheer" data-act="cheer">📣 응원</button>
     <button id="hud-cam" data-act="cam" title="화면 시점 바꾸기 (V)">📷</button>
     <button id="hud-sub" data-act="sub">🔄 교체</button>
@@ -274,10 +280,10 @@ table.keys td,table.keys th{white-space:nowrap}
     📊 경기가 끝나면 <b>MVP</b>와 선수별 기록(타수·안타·홈런·타점…)을 볼 수 있어요 · 📣 <b>응원</b> 버튼으로 박수·함성·응원가, 전광판 문구도 띄울 수 있어요<br>
     💥 <b>홈런 더비</b>: 공 10개 중 홈런 몇 개? (혼자·둘이서) · 🏆 <b>리그</b>: 모둠·반 팀을 만들고 경기 결과가 순위표에 쌓여요<br>
     🏟 <b>구장</b>: 서울 잠실·고척 돔은 넓어서 홈런이 어렵고, 인천 문학·대구는 홈런이 잘 나와요 · 동네 꼬마 구장은 홈런 펑펑! (구장마다 낮·야간·노을·돔 배경)<br>
-    🧠 <b>감독 작전</b>: 투수는 구종 카드에서 <b>견제구</b>(도루하려던 주자를 잡기 쉬움)·<b>고의사구</b>(강타자 거르기), 타자는 작전 버튼으로 강공 → 번트 → 도루 → <b>런앤히트</b>(안타면 주자가 한 베이스 더, 헛치면 도루) · 빠진 공은 <b>폭투·포일</b>로 주자가 한 베이스씩!<br>
+    🧠 <b>감독 작전</b>: 투수는 구종 카드에서 <b>견제구</b>(도루하려던 주자를 잡기 쉬움), 오른쪽 위 <b>🙅 고의사구</b> 버튼(또는 <kbd>I</kbd>)을 두 번 누르면 강타자 거르기, 타자는 작전 버튼으로 강공 → 번트 → 도루 → <b>런앤히트</b>(안타면 주자가 한 베이스 더, 헛치면 도루) · 빠진 공은 <b>폭투·포일</b>로 주자가 한 베이스씩!<br>
     🎨 팀·타순 메뉴의 <b>선수 꾸미기</b>에서 선수마다 고양이 색·등번호 · 🎙 중계 해설이 화면 위에 나와요 · 🖼 경기 결과·리그 순위를 이미지로 저장할 수 있어요 · 🏟 리그 메뉴에서 <b>토너먼트</b>와 <b>개인 순위</b>(홈런왕·타점왕…)도!<br>
     👔 팀·타순 메뉴에서 <b>감독 이름</b>, <b>팀 색</b>(로고·모자), <b>투수진</b>(선발 + 불펜 4명 이름·손)도 정해요 · 특별한 선수는 팀마다 🔥강타자·🎯교타자·💨준족 3명, 🧤수비왕 2명까지 (벤치 포함)<br>
-    📺 <b>비디오 판독</b>: 도루·견제·1루 승부가 아슬아슬하면 화면에 <b>📺 비디오 판독 요청</b> 버튼이 떠요 (팀마다 경기당 2번) · 판정이 틀렸으면 번복!<br>
+    📺 <b>비디오 판독</b>: 도루·견제·1루 승부가 아슬아슬하면 화면에 <b>📺 비디오 판독 요청</b> 버튼이 떠요 (팀마다 경기당 2번) · 정말 판정이 틀렸을 때만 번복돼요 (대부분은 원심 유지)<br>
     🧤 <b>포수 타이밍</b>: 주자가 있으면 수비 쪽에 파란 고리가 줄어들어요. 공이 미트에 들어오는 순간 결정 버튼! → 원바운드는 <b>블로킹</b>(폭투가 확 줄어요), 주자가 뛰면 <b>빠른 송구</b>(도루 저지↑) · <b>피치아웃</b>: 타자 바깥으로 쭉 빼는 공 — 볼이 되지만 도루하던 주자를 거의 잡아요<br>
     🏃 <b>작전</b> (타자: 숫자 <kbd>1</kbd>~<kbd>7</kbd>이나 위쪽 작전 카드로 바로 고르기, 둘이서는 2P가 숫자패드 · 결정 버튼을 누르면 차례로 바뀌어요 · 투수는 타자가 준비할 때까지 잠깐 기다려요): 1 강공 → 2 번트 → 3 도루 → 4 런앤히트(주자가 먼저 뛰고 좋은 공만 쳐요) → 5 히트앤런(주자가 뛰니 타자는 무조건 휘둘러야 해요, 헛스윙해도 포수를 가려 줘요) → 6 더블스틸(1·2루, 1·3루) → 7 홈스틸(3루 주자)<br>
     ⚡ <b>런다운</b>: 견제에 걸린 주자는 루 사이에 갇혀요. 주자는 ←→로 도망, 수비는 결정 버튼으로 반대쪽 수비수에게 던져서 공 가진 수비수가 태그! · 🤕 <b>몸에 맞는 공</b>: 타자 몸쪽으로 너무 깊은 공을 안 치면 1루로 걸어 나가요<br>
@@ -597,7 +603,7 @@ function newBatter(G) { G.balls = 0; G.strikes = 0; G.cu = 0; G.cv = 0; G.pko = 
 const pcFull = G => Math.round(G.rate * PCLOCK[G.bases.some(x => x) ? 1 : 0]);
 function nextPitch(G) {
   if (G.ptype >= NP || (G.prp && !pitchOpts(G).includes(G.ptype))) G.ptype = 0;
-  G.phase = 'select'; G.ball = null; G.swing = -1; G.swung = 0; G.tu = 0; G.tv = 0; G.lx = 0; G.ly = 0; G.res = null; G.bmode = 0; G.selT = 0; G.pq = 0;
+  G.phase = 'select'; G.ball = null; G.swing = -1; G.swung = 0; G.tu = 0; G.tv = 0; G.lx = 0; G.ly = 0; G.res = null; G.bmode = 0; G.selT = 0; G.pq = 0; G.ibbq = 0;
   G.pc = G.pclock ? pcFull(G) : 0; G.ct = -1;
 }
 // 주자 진루: n루타 (4 = 홈런), walk = 볼넷(밀어내기만)
@@ -723,11 +729,16 @@ function nextMode(G) { let m = G.bmode; for (let k = 0; k < 7; k++) { m = (m + 1
 const XPITCH = ['견제구', '고의사구', '피치아웃'];
 const pIdx = (G, t) => G.pst[t].length - 1;
 const pitchOpts = G => { if (G.easy) return [0, 3, 1];                        // 쉬운 야구: 빠른 공 · 느린 공 · 휘는 공만
-  const t = 1 - G.half, m = G.prp && G.pst ? G.prp[t][pIdx(G, t)] : 15, o = []; for (let i = 0; i < NP; i++) if ((m | 1) >> i & 1) o.push(i); if (!G.derby && (G.bases[0] || G.bases[1])) o.push(PK); if (!G.derby) o.push(IBB); if (!G.derby && G.bases.some(x => x)) o.push(PO); return o; };
-// 공 고르기 결정: 견제·고의사구·피치아웃은 바로, 구종은 조준으로
+  const t = 1 - G.half, m = G.prp && G.pst ? G.prp[t][pIdx(G, t)] : 15, o = []; for (let i = 0; i < NP; i++) if ((m | 1) >> i & 1) o.push(i); if (!G.derby && G.bases.some(x => x)) o.push(PO); if (!G.derby && (G.bases[0] || G.bases[1])) o.push(PK); return o; };   // 고의사구는 구종 목록에 없어요 (따로 버튼)
+// 고의사구: 구종과 따로 (cmd 15) · 한 번 누르면 확인, 한 번 더 누르면 타자를 걸러요
+function reqIBB(G, t) {
+  if (G.phase !== 'select' || t !== pitTeam(G) || G.easy || G.derby || G.tut) return;
+  if (!G.ibbq) { G.ibbq = 1; return; }
+  G.ibbq = 0; G.pitchN++; finishPA(G, { kind: 'walk', out: 0, bases: 0, text: '고의사구 (거르기)', ibb: 1 });
+}
+// 공 고르기 결정: 견제·피치아웃은 바로, 구종은 조준으로
 function choosePitch(G) {
   if (G.ptype === PK) return pickoff(G);
-  if (G.ptype === IBB) { G.pitchN++; finishPA(G, { kind: 'walk', out: 0, bases: 0, text: '고의사구 (거르기)', ibb: 1 }); return; }
   if (G.ptype === PO) { G.tu = batHand(G) === 1 ? -1.8 : 1.8; G.tv = 0.15; G.ptype = 0; G.po = 1; throwBall(G); return; }   // 타자 바깥쪽으로 쭉 빼요
   G.phase = 'aim';
 }
@@ -810,8 +821,8 @@ function bunt(G, pos) {
 }
 // 도루: 공이 포수에게 간 뒤 결정 (느린 공·낮은 공일수록 성공하기 쉬움)
 // ===== 비디오 판독 (VAR) =====
-// 아슬아슬한 판정이 나오면 불리한 팀이 판독을 요청할 수 있어요 (경기당 2번). 판정이 틀렸을 확률 35%
-function setClose(G, c) { if (G.easy) return; c.wrong = rnd(G) < 0.35; c.id = G.tick; G.close = c; }
+// 아슬아슬한 판정이 나오면 불리한 팀이 판독을 요청할 수 있어요 (경기당 2번). 판정이 틀렸을 확률은 보통 20% 안팎 (진짜 아슬아슬할수록 조금 더)
+function setClose(G, c) { if (G.easy) return; c.wrong = rnd(G) < (c.pw !== undefined ? c.pw : 0.2); delete c.pw; c.id = G.tick; G.close = c; }
 function reqVar(G, t) {
   const c = G.close;
   if (G.phase !== 'result' || !c || c.used || c.t !== t || !(G.chal[t] > 0)) return;
@@ -857,7 +868,7 @@ function steal(G, bl) {
     else { outs = 1; text = quick + '홈스틸 실패! 홈에서 아웃'; }
   } else if (m === 5 && b[0] && b[1] && !b[2]) {                          // 1·2루 더블스틸: 포수는 3루로 던져요
     const r2 = b[1], r1 = b[0], p = 0.52 + base + (fast(r2) ? 0.18 : 0), roll = rnd(G), ok = roll < p;
-    if (Math.abs(roll - p) < 0.15) setClose(G, { k: 'steal', lead: 2, runner: r2, call: ok ? 'safe' : 'out', t: ok ? pt : bt });
+    if (Math.abs(roll - p) < 0.15) setClose(G, { pw: 0.08 + 0.24 * (1 - Math.abs(roll - p) / 0.15), k: 'steal', lead: 2, runner: r2, call: ok ? 'safe' : 'out', t: ok ? pt : bt });
     b[0] = 0; b[1] = r1; mv.push([1, 2]);
     if (ok) { b[2] = r2; mv.push([2, 3]); text = '더블스틸 성공!!'; } else { outs = 1; text = quick + '더블스틸 · 3루에서 아웃! (1루 주자는 2루로)'; }
   } else if (m === 5 && b[0] && b[2] && !b[1]) {                          // 1·3루 더블스틸: 포수가 2루로 던지는 틈에 3루 주자가 홈으로
@@ -873,7 +884,7 @@ function steal(G, bl) {
     const lead = b[1] && !b[2] ? 2 : b[0] && !b[1] ? 1 : 0;
     if (!lead) return '';
     const runner = b[lead - 1], p = 0.6 + base + (fast(runner) ? 0.18 : 0) - (lead === 2 ? 0.12 : 0), roll = rnd(G), ok = roll < p;
-    if (Math.abs(roll - p) < 0.15) setClose(G, { k: 'steal', lead, runner, call: ok ? 'safe' : 'out', t: ok ? pt : bt });
+    if (Math.abs(roll - p) < 0.15) setClose(G, { pw: 0.08 + 0.24 * (1 - Math.abs(roll - p) / 0.15), k: 'steal', lead, runner, call: ok ? 'safe' : 'out', t: ok ? pt : bt });
     if (lead === 2) {                                                    // 2루 → 3루 (런앤히트·히트앤런이면 1루 주자도 같이)
       b[1] = 0; if (ok) { b[2] = runner; mv.push([2, 3]); }
       if (b[0] && m >= 3) { b[1] = b[0]; b[0] = 0; mv.push([1, 2]); }
@@ -1025,7 +1036,7 @@ function doCmd(G, t, c) {
 }
 function tick(G, inputs) {
   G.tick++;
-  if (G.phase === 'select') for (const t of [0, 1]) { const c = (inputs[t] || IDLE).cmd; if (c !== undefined && c >= 0 && c < 16) doCmd(G, t, c); }
+  if (G.phase === 'select') for (const t of [0, 1]) { const c = (inputs[t] || IDLE).cmd; if (c === 15) reqIBB(G, t); else if (c !== undefined && c >= 0 && c < 15) doCmd(G, t, c); }
   if ((G.phase === 'select' || G.phase === 'aim') && !G.easy && !G.derby) { const c = (inputs[batTeam(G)] || IDLE).cmd; if (c >= 16 && c <= 22 && modeOK(G, c - 16)) G.bmode = c - 16; }   // 작전 바로 고르기 (숫자키·작전 카드)
   const pin = inputs[pitTeam(G)] || IDLE, bin = inputs[batTeam(G)] || IDLE;
   // 타자는 언제든 방망이 위치를 옮길 수 있음
@@ -1043,12 +1054,12 @@ function tick(G, inputs) {
       if (bin.hit && !G.easy) G.bmode = nextMode(G);                   // 타자: 결정 버튼으로 작전 (강공 → 번트 → 도루 …)
       if (pclockTick(G)) break;
       G.selT++; const ready = G.selT >= G.rate * 1.2;               // 타자가 준비하는 동안(1.2초)은 아직 못 던져요 (구종·수비는 미리 골라 둘 수 있음)
-      if (pin.g >= 0) { const o = pitchOpts(G); if (pin.g < o.length) { G.ptype = o[pin.g]; if (ready) { choosePitch(G); break; } G.pq = 1; } }   // 비밀 작전 모드: 키 하나로 바로 고르기
+      if (pin.g >= 0) { const o = pitchOpts(G); if (pin.g < o.length) { G.ptype = o[pin.g]; G.ibbq = 0; if (ready) { choosePitch(G); break; } G.pq = 1; } }   // 비밀 작전 모드: 키 하나로 바로 고르기
       if (ready && G.pq) { G.pq = 0; choosePitch(G); break; }        // 미리 눌러 둔 결정은 타자가 준비되면 바로   // 비밀 작전 모드: 키 하나로 바로 고르기
-      if (pin.x && pin.x !== G.lx) { const o = pitchOpts(G), i = Math.max(0, o.indexOf(G.ptype)); G.ptype = o[(i + pin.x + o.length) % o.length]; }
+      if (pin.x && pin.x !== G.lx) { const o = pitchOpts(G), i = Math.max(0, o.indexOf(G.ptype)); G.ptype = o[clamp(i + pin.x, 0, o.length - 1)]; G.ibbq = 0; }   // 끝에서 반대쪽으로 넘어가지 않아요
       if (pin.y && pin.y !== G.ly && !G.easy) { const t = pitTeam(G); G.def[t] = (G.def[t] + pin.y + DEFS.length) % DEFS.length; }
       G.lx = pin.x; G.ly = pin.y;
-      if (pin.hit) { if (ready) choosePitch(G); else G.pq = 1; }
+      if (pin.hit) { G.ibbq = 0; if (ready) choosePitch(G); else G.pq = 1; }
       break;
     case 'aim':                                                      // 투수: 코스 조준
       if (bin.hit && !G.easy) G.bmode = nextMode(G);
@@ -1229,7 +1240,8 @@ function aiInput(ai, G) {
       if (G.bmode === 1 && ai.def !== 3 && Math.random() < 0.05) ai.def = 3;       // 번트 자세면 전진 수비
       if (G.easy) ai.def = undefined;                                    // 쉬운 야구: 수비 위치 안 바꿈
       if (ai.def !== undefined && G.def[ai.me] !== ai.def) { if (ai.t % 8 < 2) inp.y = 1; return inp; }
-      if (G.ptype !== P.type) { if (ai.t % 8 < 2) inp.x = 1; return inp; }
+      if (P.type === IBB) { if (ai.t % 8 === 0) inp.cmd = 15; return inp; }   // 고의사구 버튼 (두 번)
+      if (G.ptype !== P.type) { const o = pitchOpts(G), d = o.indexOf(P.type) - o.indexOf(G.ptype); if (ai.t % 8 < 2) inp.x = d >= 0 ? 1 : -1; return inp; }
       if (ai.t % 6 === 0) inp.hit = true; return inp;
     }
     const du = P.u - G.tu, dv = P.v - G.tv;
@@ -1410,7 +1422,7 @@ function viewFromGame(G, a) {
   return {
     phase: G.phase, timer: G.timer, inning: G.inning, innings: G.innings, half: G.half, outs: G.outs, balls: G.balls, strikes: G.strikes,
     bases: G.bases, def: G.def, hand: G.hand, phand: G.phand, assist: G.assist, bmode: G.bmode, lu: G.lu, bo: G.bo, src: G.src, bench: G.bench, used: G.used, sub: G.sub, tick: G.tick, hitR: G.hitR, win: G.win, score: G.score, hits: G.hits, line: G.line, ptype: G.ptype, tu: G.tu, tv: G.tv, cu: G.cu, cv: G.cv, ball: G.ball,
-    swing: G.swing, res: G.res, pitchN: G.pitchN, pst: G.pst, st: G.st, errs: G.errs, derby: G.derby, dleft: G.dleft, park: G.park, fence: G.fence, tb: G.tb, close: G.close, chal: G.chal, cat: G.cat, easy: G.easy, tut: G.tut, prp: G.prp, pfm: G.pfm, wx: G.wx, fly: G.fly, spray: G.spray, lhr: G.lhr, cold: G.cold, rd: G.rd, pc: G.pc, pclock: G.pclock, ct: G.ct, winner: G.winner, rate: G.rate, fx: G.fx, bat: batTeam(G), pit: pitTeam(G)
+    swing: G.swing, res: G.res, pitchN: G.pitchN, pst: G.pst, st: G.st, errs: G.errs, derby: G.derby, dleft: G.dleft, park: G.park, fence: G.fence, tb: G.tb, close: G.close, chal: G.chal, cat: G.cat, easy: G.easy, tut: G.tut, prp: G.prp, pfm: G.pfm, wx: G.wx, fly: G.fly, spray: G.spray, lhr: G.lhr, cold: G.cold, rd: G.rd, pc: G.pc, pclock: G.pclock, ibbq: G.ibbq, ct: G.ct, winner: G.winner, rate: G.rate, fx: G.fx, bat: batTeam(G), pit: pitTeam(G)
   };
 }
 
@@ -1557,6 +1569,7 @@ addEventListener('keydown', e => {
   if (tk && !e.repeat) tacK[mode === 'local' ? (tm[1] === 'Numpad' ? 1 : 0) : mode === 'guest' ? 1 : 0] = +tm[2] - 1;   // 둘이서: 숫자줄 = 1P, 숫자패드 = 2P
   if (inGame() && (GAME_CODES.has(e.code) || hk || tk)) e.preventDefault();
   if ((e.code === 'Escape' || e.code === 'KeyP') && !e.repeat) togglePause();
+  if (e.code === 'KeyI' && !e.repeat && inGame()) { e.preventDefault(); actions.ibb(); }   // I: 고의사구 (두 번)
   if (e.code === 'KeyV' && !e.repeat && inGame() && !(G && G.derby && mode !== 'spec')) toggleCam();   // V: 관중석 시점 ↔ 중계 화면
 });
 addEventListener('keyup', e => { keys[e.code] = false; });
@@ -2107,8 +2120,20 @@ function render(v, now, dt) {
     ctx.fillStyle = '#0b1a3a'; ctx.fillRect(x0 + 12, y0 + 34, 216, 70);
     for (let i = 0; i < 6; i++) { ctx.fillStyle = `rgba(255,255,255,${0.05 + 0.05 * ((i + Math.floor(now / 90)) % 3)})`; ctx.fillRect(x0 + 12, y0 + 34 + i * 12, 216, 2); }   // 화면 줄무늬
     outlined('📺 비디오 판독 중' + '.'.repeat(1 + Math.floor(now / 350) % 3), HALF, y0 + 18, 13, '#ffe066', '#111');
-    outlined(closeDesc(c), HALF, y0 + 60, 12, '#fff', '#111');
-    outlined(`${Names[c.t]} 요청`, HALF, y0 + 84, 9, '#dee2e6', '#111');
+    {                                                                  // 느린 화면: 주자 발과 공 중 무엇이 먼저 닿았나
+      const safe = (c.call === 'safe') !== !!c.wrong, sk = Math.min(1, k * 1.25), bx = HALF + 30, by = y0 + 84;
+      ctx.save(); ctx.beginPath(); ctx.rect(x0 + 12, y0 + 34, 216, 70); ctx.clip();
+      ctx.fillStyle = '#c98b52'; ctx.fillRect(x0 + 12, by - 6, 216, 26);
+      ctx.fillStyle = '#fff'; ctx.save(); ctx.translate(bx, by + 4); ctx.rotate(Math.PI / 4); ctx.fillRect(-6, -6, 12, 12); ctx.restore();
+      const rArr = safe ? 0.78 : 0.92, gArr = safe ? 0.9 : 0.74;           // 먼저 닿는 쪽이 이겨요
+      const rx = x0 + 20 + (bx - 10 - x0 - 20) * Math.min(1, sk / rArr), gx = x0 + 228 - (x0 + 228 - bx - 8) * Math.min(1, sk / gArr);
+      drawCat(rx, by + 2, 0.55, skinOf(v.bat), v.bat, { run: sk < rArr ? now / 60 : 0, face: 1 });
+      ctx.fillStyle = '#8d5524'; ctx.beginPath(); ctx.arc(gx, by - 4, 5, 0, 7); ctx.fill(); drawBall(gx - 3, by - 6, 2.2);
+      ctx.restore();
+      if (sk >= 1) outlined(safe ? '발이 먼저!' : '공이 먼저!', x0 + 222, y0 + 46, 10, '#ffe066', '#111', 'right');
+    }
+    outlined(closeDesc(c), x0 + 18, y0 + 46, 9, '#fff', '#111', 'left');
+    outlined(`${Names[c.t]} 요청`, HALF + 70, y0 + 26, 8, '#dee2e6', '#111');
     ctx.fillStyle = 'rgba(255,255,255,.2)'; ctx.fillRect(x0 + 20, y0 + 114, 200, 5); ctx.fillStyle = '#ffd43b'; ctx.fillRect(x0 + 20, y0 + 114, 200 * Math.min(1, k), 5);
   }
   if (v.phase === 'result' && v.close && !v.close.used && v.chal[v.close.t] > 0 && mode !== 'demo' && (myTeam(v.close.t) || mode === 'local')) {
@@ -3333,6 +3358,7 @@ function checkRemoteCheer() {
   if (!first && m.role !== Net.role && /^📣/.test(m.text || '')) { const tx = String(m.text).replace(/^📣\s*/, '').trim(); if (!tx || maskBad(tx).hit || /\*{2,}/.test(tx)) return; showBoard(tx); Sound.point(); Music.cheer(0.6, 2); }
 }
 function updHitLabel(v) {
+  const ib = $('#hud-ibb'); if (ib) { const on = inGame() && v.phase === 'select' && !v.easy && !v.derby && !v.tut && myTeam(v.pit) && mode !== 'demo' && mode !== 'spec' && !$('.screen.show'); ib.style.display = on ? 'block' : 'none'; if (on) { ib.classList.toggle('q', !!v.ibbq); ib.textContent = v.ibbq ? '🙅 한 번 더 누르면 거르기!' : '🙅 고의사구'; } }
   const vb = $('#hud-var'); if (vb) { const c = v.close, on = inGame() && v.phase === 'result' && c && !c.used && v.chal[c.t] > 0 && myTeam(c.t) && mode !== 'demo' && !$('.screen.show') && !cmdQ[c.t].includes(14); vb.style.display = on ? 'block' : 'none'; if (on) vb.textContent = `📺 비디오 판독 요청 (${v.chal[c.t]}번 남음)${mode === 'local' ? ' · ' + Names[c.t] : ''}`; }
   const cb = $('#hud-cheer'); if (cb) cb.style.display = inGame() && mode !== 'demo' && !$('.screen.show') ? 'block' : 'none';
   const cmb = $('#hud-cam'); if (cmb) { cmb.style.display = inGame() && mode !== 'demo' && !$('.screen.show') && !v.derby ? 'block' : 'none'; cmb.textContent = camStand(v) ? '📺' : '🏟'; cmb.title = camStand(v) ? '중계 화면으로 (V)' : '관중석 시점으로 (V)'; }
@@ -3820,6 +3846,7 @@ const actions = {
   lgreset: () => { if (!confirm('리그의 모든 팀과 경기 결과를 지울까요? 되돌릴 수 없어요.')) return; League.teams = []; League.games = []; League.nid = 1; League.ps = {}; League.tour = null; saveLeague(); buildLeague(); },
   lgsave: () => { const t = LeagueEdit && lgTeam(LeagueEdit.id); if (t) { Object.assign(t, slotToTeam(0), { id: t.id }); saveLeague(); teamToSlot(LeagueEdit.prev, 0); saveSettings(); updTeamBtn(); toast(`'${t.name}' 저장!`); } LeagueEdit = null; updLeagueEdit(); openLeague(); },
   cheer: () => openCheer(),
+  ibb: () => { const g = isOnline() ? RB && RB.G : G; if (!g || g.phase !== 'select' || g.easy || g.derby || g.tut) return; const t = pitTeam(g); if (myTeam(t) && !cmdQ[t].includes(15)) { cmdQ[t].push(15); } },
   var: () => { const g = isOnline() ? RB && RB.G : G; if (!g || !g.close) return; const t = g.close.t; if (myTeam(t) && !cmdQ[t].includes(14)) cmdQ[t].push(14); },
   tourmake: () => { const ids = [...document.querySelectorAll('.tchk:checked')].map(x => +x.value); if (ids.length < 3) { toast('3팀 이상 골라 주세요'); return; } makeTour(ids, $('#tour-seed').value === 'rank'); saveLeague(); buildLeague(); },
   tourdel: () => { if (!confirm('토너먼트 대진표를 지울까요? (개인 기록은 남아요)')) return; League.tour = null; saveLeague(); buildLeague(); },
