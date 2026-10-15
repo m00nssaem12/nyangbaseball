@@ -3509,6 +3509,7 @@ document.addEventListener('click', e => {
 document.addEventListener('click', e => {
   const q = s => e.target.closest && e.target.closest(s);
   let b;
+  { const adm = q('[data-lgdel],[data-lggdel],[data-lgimp],[data-lged]'); if (adm && typeof ckOpen === 'function' && !ckOpen()) { ckAuth(() => adm.click()); return; } }   // 🔒 리그 팀 고치기 · 지우기는 선생님만
   if ((b = q('[data-lgdel]'))) { const id = +b.dataset.lgdel, t = lgTeam(id); if (t && confirm(`'${t.name}' 팀을 지울까요? 이 팀의 경기 결과도 같이 지워져요.`)) { League.teams = League.teams.filter(x => x.id !== id); League.games = League.games.filter(g => g.a !== id && g.b !== id); for (const k in (League.ps || {})) if (League.ps[k].id === id) delete League.ps[k]; saveLeague(); buildLeague(); } }
   else if ((b = q('[data-lggdel]'))) { const i = +b.dataset.lggdel; if (confirm('이 경기 결과를 지울까요?')) { League.games.splice(i, 1); saveLeague(); buildLeague(); } }
   else if ((b = q('[data-lgimp]'))) { const i = +b.dataset.lgimp; if (League.teams.some(t => t.name === teamName(i))) { toast('같은 이름의 팀이 이미 있어요'); return; } const t = Object.assign(newLeagueTeam(teamName(i), Settings['logo' + i]), slotToTeam(i)); League.teams.push(t); saveLeague(); buildLeague(); toast(`'${t.name}' 팀을 리그에 넣었어요`); }
@@ -4785,7 +4786,7 @@ function ckPinBox(title, cb, sub, opt) {                                 // 비�
   opt = opt || {};
   let el = document.getElementById('ck-pin'); if (!el) { el = document.createElement('div'); el.id = 'ck-pin'; document.body.appendChild(el); }
   el.innerHTML = `<div class="ck-pin-card"><div class="t">${opt.icon || '🔒'} ${title}</div>${sub ? `<div class="s">${sub}</div>` : ''}` +
-    (opt.text ? `<input id="ck-pin-in" class="txt" type="text" maxlength="${opt.max || 20}" autocomplete="off" placeholder="${opt.ph || ''}">` : `<input id="ck-pin-in" type="password" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="숫자 4~8자리">`) +
+    (opt.text ? `<input id="ck-pin-in" class="txt" type="${opt.secret ? 'password' : 'text'}" maxlength="${opt.max || 20}" autocomplete="off" placeholder="${opt.ph || ''}">` : `<input id="ck-pin-in" type="password" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="숫자 4~8자리">`) +
     `<div class="row"><button class="ck-sbtn gray" id="ck-pin-no">취소</button><button class="ck-sbtn" id="ck-pin-ok">확인</button></div>${opt.extra ? `<button class="ck-sbtn blue ck-pin-x" id="ck-pin-x">${opt.extra.label}</button>` : ''}</div>`;
   el.style.display = 'flex';
   const inp = el.querySelector('#ck-pin-in'), close = v => { el.style.display = 'none'; el.innerHTML = ''; cb(v); };
@@ -4795,24 +4796,41 @@ function ckPinBox(title, cb, sub, opt) {                                 // 비�
   inp.onkeydown = e => { e.stopPropagation(); if (e.key === 'Enter') close(inp.value.trim()); if (e.key === 'Escape') close(null); };
   setTimeout(() => inp.focus(), 30);
 }
+// 🗝️ 마스터 비밀번호: 선생님 비밀번호를 처음 만들 때 · 잊어서 다시 만들 때만 물어요 (학생이 먼저 만들어 버리지 못하게)
+const CK_MASTER_H = '1c923f96295bd3272599d6cf78d7c7540aa576019557cd4d81af0f96d13b5374', CK_MASTER_F = '8tk5er';
+async function ckMasterOk(v) {
+  try { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('nyang-master:' + v)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('') === CK_MASTER_H; }
+  catch (e) { return ckHash(v) === CK_MASTER_F; }
+}
+function ckMaster(then, sub, extra) {
+  ckPinBox('마스터 비밀번호', async v => {
+    if (v === null) return;
+    if (!(await ckMasterOk(v))) { toast('마스터 비밀번호가 달라요'); return; }
+    then();
+  }, sub, { text: 1, secret: 1, icon: '🗝️', ph: '마스터 비밀번호', max: 20, extra });
+}
 function ckAuth(then) {
   if (ckOpen()) { then(); return; }
-  if (!ckLocked()) { ckPinNew(then, 1); return; }                       // 처음: 선생님 비밀번호부터 만들어요
+  if (!ckLocked()) {                                                      // 처음: 마스터 비밀번호 → 선생님 비밀번호 만들기
+    ckMaster(() => ckPinNew(then, 1), '아직 이 기기에 선생님 비밀번호가 없어요<br>마스터 비밀번호를 넣어야 만들 수 있어요',
+      { label: '🌐 다른 기기에서 만든 반 코드로 연결', fn: () => ckJoin(then) });
+    return;
+  }
   ckPinBox('선생님 비밀번호', v => {
     if (v === null) return;
     if (ckHash(v) !== ckT().h) { toast('비밀번호가 달라요'); return; }
     CK_OPEN = Date.now() + 10 * 60 * 1000; toast('🔓 선생님 모드 (10분)'); ckReDraw(); then();
-  });
+  }, '', { extra: { label: '🗝️ 비밀번호를 잊었어요', fn: () => ckMaster(() => ckPinNew(then, 2), '마스터 비밀번호를 넣으면 선생님 비밀번호를 새로 정해요') } });
 }
 function ckPinNew(then, first) {
-  ckPinBox(first ? '선생님 비밀번호 만들기' : '새 비밀번호', a => {
+  ckPinBox(first === 1 ? '선생님 비밀번호 만들기' : '새 비밀번호', a => {
     if (a === null) return; if (!/^\d{4,8}$/.test(a)) { toast('숫자 4~8자리로 정해요'); return; }
     ckPinBox('한 번 더 넣어 주세요', b => {
       if (b === null) return; if (a !== b) { toast('두 번 넣은 비밀번호가 달라요'); return; }
       const T = ckT(); CK_OLDH = T.h || ''; T.h = ckHash(a); CKLS.set('nyangTeacher', T); CK_OPEN = Date.now() + 10 * 60 * 1000;
-      toast('🔒 선생님 비밀번호를 정했어요 · 꼭 기억해 두세요'); ckReDraw(); if (!first) ckSyncRewrap(a); if (then) then();
+      toast('🔒 선생님 비밀번호를 정했어요 · 꼭 기억해 두세요'); ckReDraw(); if (first !== 1) ckSyncRewrap(a); if (then) then();
     });
-  }, first ? '처음 한 번만 정해요 · 학생 선택, 명단, 대회·운동회 설정에 써요<br>이 기기의 모든 냥냥 게임에 같이 쓰여요 · 잊으면 찾을 수 없으니 꼭 적어 두세요' : '숫자 4~8자리', first ? { extra: { label: '🌐 다른 기기에서 만든 반 코드로 연결', fn: () => ckJoin(then) } } : null);
+  }, first === 1 ? '처음 한 번만 정해요 · 학생 선택, 명단, 대회·운동회 설정에 써요<br>이 기기의 모든 냥냥 게임에 같이 쓰여요 · 잊으면 마스터 비밀번호로 다시 정해요' : '숫자 4~8자리');
 }
 function ckReDraw() { try { updWhoBtn(); } catch (e) {} try { if ($('#scr-who') && $('#scr-who').classList.contains('show')) whoRender(); } catch (e) {} try { if (typeof SD_HUB !== 'undefined') hubPlayers(); } catch (e) {} }
 function ckPinSet() { ckAuth(() => ckPinNew(null, 0)); }
@@ -5278,6 +5296,8 @@ const actions = {
   openChat, closeChat,
   quickChat: b => { sendChat(b.dataset.q); }
 };
+// 🔒 팀·타순(견제 응원 · 선발 로테이션 포함)과 리그 · 토너먼트 관리는 선생님 비밀번호가 있어야 해요 (경기 시작은 그대로)
+['team', 'lgadd', 'lgreset', 'lgsave', 'tourmake', 'tourdel', 'lgimport'].forEach(k => { const f = actions[k]; actions[k] = (...a) => typeof ckAuth === 'function' ? ckAuth(() => f(...a)) : f(...a); });
 document.addEventListener('click', e => {
   const sw = e.target.closest('.sw button');
   if (sw) { pickSkin(sw.parentElement.dataset.side, +sw.dataset.skin); return; }
