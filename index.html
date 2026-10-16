@@ -448,7 +448,7 @@ table.keys td,table.keys th{white-space:nowrap}
     💥 <b>홈런 더비</b>: 공 10개 중 홈런 몇 개? (혼자·둘이서) · 🏆 <b>리그</b>: 모둠·반 팀을 만들고 경기 결과가 순위표에 쌓여요<br>
     🏟 <b>구장</b>: 서울 잠실·고척 돔은 넓어서 홈런이 어렵고, 인천 문학·대구는 홈런이 잘 나와요 · 동네 꼬마 구장은 홈런 펑펑! (구장마다 낮·야간·노을·돔 배경)<br>
     🧠 <b>감독 작전</b>: 투수는 구종 카드에서 <b>견제구</b>(도루하려던 주자를 잡기 쉬움), 오른쪽 위 <b>🙅 고의사구</b> 버튼(또는 <kbd>I</kbd>)을 두 번 누르면 강타자 거르기, 타자는 작전 버튼으로 강공 → 번트 → 도루 → <b>런앤히트</b>(안타면 주자가 한 베이스 더, 헛치면 도루) · 빠진 공은 <b>폭투·포일</b>로 주자가 한 베이스씩!<br>
-    🎨 팀·타순 메뉴의 <b>선수 꾸미기</b>에서 선수마다 고양이 색·등번호 · 🎙 중계 해설이 화면 위에 나와요 · 🖼 경기 결과·리그 순위를 이미지로 저장할 수 있어요 · 🏟 리그 메뉴에서 <b>토너먼트</b>와 <b>개인 순위</b>(홈런왕·타점왕…)도!<br>
+    🧤 팀·타순 메뉴의 <b>수비 위치 · 등번호</b>에서 선수마다 자리(포수·유격수·지명타자…)와 등번호(투수도), <b>선수 꾸미기</b>에서 고양이 색 · 🎙 중계 해설이 화면 위에 나와요 · 🖼 경기 결과·리그 순위를 이미지로 저장할 수 있어요 · 🏟 리그 메뉴에서 <b>토너먼트</b>와 <b>개인 순위</b>(홈런왕·타점왕…)도!<br>
     👔 팀·타순 메뉴에서 <b>감독 이름</b>, <b>팀 색</b>(로고·모자), <b>투수진</b>(선발 + 불펜 4명 이름·손)도 정해요 · <b>🎲 선발 로테이션</b>을 켜면 선발 5명 중 경기마다 무작위로 정해져요 · 팀마다 <b>📣 견제 응원</b> 문구(마!)도 정할 수 있어요 · 특별한 선수는 팀마다 🔥강타자·🎯교타자·💨준족 3명, 🧤수비왕 2명까지 (벤치 포함)<br>
     📺 <b>비디오 판독</b>: 도루·견제·1루 승부가 아슬아슬하면 화면에 <b>📺 비디오 판독 요청</b> 버튼이 떠요 (팀마다 경기당 2번) · 정말 판정이 틀렸을 때만 번복돼요 (대부분은 원심 유지)<br>
     🧤 <b>포수 타이밍</b>: 주자가 있으면 수비 쪽에 파란 고리가 줄어들어요. 공이 미트에 들어오는 순간 결정 버튼! → 원바운드는 <b>블로킹</b>(폭투가 확 줄어요), 주자가 뛰면 <b>빠른 송구</b>(도루 저지↑) · <b>피치아웃</b>: 타자 바깥으로 쭉 빼는 공 — 볼이 되지만 도루하던 주자를 거의 잡아요<br>
@@ -750,7 +750,7 @@ function newGame(innings, rate, seed, opt) {
   G.pfm = [opt.pf0 == null ? DEF_PFORM.slice() : handDecode(opt.pf0, 5), opt.pf1 == null ? DEF_PFORM.slice() : handDecode(opt.pf1, 5)];
   G.wx = opt.wx >= 4 ? Math.floor(rnd(G) * 4) : (opt.wx | 0) % 4;                // 날씨: 0 맑음, 1 비, 2 순풍, 3 역풍
   G.spray = [[], []]; G.lhr = null; G.fly = null; G.fx.fly = 0;
-  G.cat = [Math.min(8, Math.max(0, opt.cat0 == null ? 7 : opt.cat0 | 0)), Math.min(8, Math.max(0, opt.cat1 == null ? 7 : opt.cat1 | 0))];   // 포수 타순 자리
+  G.pos = [posDec(opt.cat0 == null ? 7 : opt.cat0), posDec(opt.cat1 == null ? 7 : opt.cat1)]; G.cat = [G.pos[0].indexOf(0), G.pos[1].indexOf(0)];   // 수비 위치 · 포수 타순 자리
   G.easy = opt.easy ? 1 : 0;                                            // 쉬운 야구: 구종 3개 · 수비 위치·작전·비디오 판독·수비 조작 없음
   G.errs = [0, 0]; G.chal = [2, 2]; G.close = null; G.fx.var = 0;
   capTypes(G.lu[0], G.bench[0]); capTypes(G.lu[1], G.bench[1]);
@@ -819,6 +819,14 @@ function throwBall(G) {
 }
 // 수비 위치: [각도(도, +는 1루쪽), 거리(피트)] — 투수, 포수, 1루, 2루, 유격, 3루, 좌익, 중견, 우익
 const FIELD0 = [[0, 60], [0, -8], [34, 95], [12, 132], [-12, 132], [-34, 95], [-30, 255], [0, 285], [30, 255]];
+// 🧤 수비 위치: 타순 9명이 저마다 한 자리씩 (0 포수 · 1 1루수 · 2 2루수 · 3 유격수 · 4 3루수 · 5 좌익수 · 6 중견수 · 7 우익수 · 8 지명타자)
+const POSN = ['포수', '1루수', '2루수', '유격수', '3루수', '좌익수', '중견수', '우익수', '지명타자'];
+const FNAME = ['투수', '포수', '1루수', '2루수', '유격수', '3루수', '좌익수', '중견수', '우익수'];   // 수비수 자리(0~8) 이름
+function posDefault(cat) { const p = [6, 3, 2, 1, 4, 5, 7, 0, 8]; cat = cat >= 0 && cat <= 8 ? cat | 0 : 7; if (cat !== 7) { const x = p[cat]; p[cat] = p[7]; p[7] = x; } return p; }
+function posOk(p) { if (!Array.isArray(p) || p.length !== 9) return false; for (let x = 0; x < 9; x++) if (p.filter(y => y === x).length !== 1) return false; return true; }
+function posEnc(p) { return 9 + (posOk(p) ? p : posDefault(7)).reduceRight((n, x) => n * 9 + x, 0); }   // 9 이상이면 수비 위치 전체 (8 이하는 예전처럼 포수 자리만)
+function posDec(v) { v = +v || 0; if (v < 9) return posDefault(v); v -= 9; const p = []; for (let i = 0; i < 9; i++) { p.push(v % 9); v = Math.floor(v / 9); } return posOk(p) ? p : posDefault(7); }
+function posGlove(G, fi) { const t = pitTeam(G), s = fi > 0 && G.pos ? G.pos[t].indexOf(fi - 1) : -1; return s >= 0 && G.lu[t][s] === 4 ? 1.12 : 1; }   // 수비왕이 공 간 자리에 있으면 +12%
 const DEFS = [
   { name: '기본',       dIn: 0,   dOut: 0,   rIn: 0,   rOut: 0 },
   { name: '왼쪽 당김',  dIn: -9,  dOut: -12, rIn: 0,   rOut: 0 },
@@ -826,7 +834,7 @@ const DEFS = [
   { name: '전진 수비',  dIn: 0,   dOut: 0,   rIn: -18, rOut: -45 },
   { name: '후진 수비',  dIn: 0,   dOut: 0,   rIn: 10,  rOut: 35 }
 ];
-const glove = G => 1 + 0.06 * G.lu[pitTeam(G)].filter(t => t === 4).length;   // 수비왕 한 명마다 수비 범위 +6%
+const glove = G => { const t = pitTeam(G); return 1 + 0.06 * G.lu[t].filter((x, s) => x === 4 && !(G.pos && G.pos[t][s] === 8)).length; };   // 수비왕 한 명마다 수비 범위 +6% (지명타자는 수비에 안 나가요)
 function fielders(def) {
   const D = DEFS[def] || DEFS[0];
   return FIELD0.map((p, i) => i < 2 ? p.slice() : i < 6 ? [p[0] + D.dIn, p[1] + D.rIn] : [p[0] + D.dOut, p[1] + D.rOut]);
@@ -859,11 +867,11 @@ function contact(G, e, d, pos) {
     let best = -1, bd = 1e9;
     for (let i = 2; i < 6; i++) { const dd = Math.abs(F[i][0] - dir); if (dd < bd) { bd = dd; best = i; } }
     if (Math.abs(dir) < 5 && rnd(G) < 0.3) { bd = 0; best = 0; }                    // 투수 정면
-    const reach = (6 + rnd(G) * 7) * (1 - q * 0.3) * (F[best][1] < 110 ? 1.15 : 1) * glove(G);
+    const reach = (6 + rnd(G) * 7) * (1 - q * 0.3) * (F[best][1] < 110 ? 1.15 : 1) * glove(G) * posGlove(G, best);
     R.catcher = best; R.near = Math.abs(bd - reach) < 1.6 ? 1 : 0;                 // 1루에서 아슬아슬 (비디오 판독 대상)
     if ((dist < 50 && rnd(G) < 0.3) || (btype(G) === 3 && bd < reach && rnd(G) < 0.3)) { R.bases = 1; R.kind = 'single'; R.text = '내야 안타!'; R.dist = Math.min(dist, 90); }
     else if (bd < reach && errOf(G)) { R.bases = 1; R.kind = 'single'; R.err = 1; R.text = '실책! 공을 놓쳤어요'; R.dist = Math.min(dist, F[best][1]); }
-    else if (bd < reach) { R.out = 1; R.kind = 'ground'; R.text = '땅볼 아웃'; R.dist = Math.min(dist, F[best][1]); }
+    else if (bd < reach) { R.out = 1; R.kind = 'ground'; R.text = FNAME[best] + ' 땅볼 아웃'; R.dist = Math.min(dist, F[best][1]); }
     else { R.bases = Math.abs(dir) > 36 && q > 0.75 && rnd(G) < 0.4 ? 2 : 1; R.kind = R.bases === 2 ? 'double' : 'single'; R.text = R.bases === 2 ? '2루타!' : '안타!'; R.catcher = -1; }
     return R;
   }
@@ -873,7 +881,7 @@ function contact(G, e, d, pos) {
   const land = polar(dir, dist);
   let best = 2, bd = 1e9;
   for (let i = 0; i < 9; i++) { if (i === 1 && dist > 40) continue; const p = polar(F[i][0], F[i][1]), dd = Math.hypot(p[0] - land[0], p[1] - land[1]); if (dd < bd) { bd = dd; best = i; } }
-  const range = 32 * Math.max(0, hang - 0.3) * (0.8 + rnd(G) * 0.4) * glove(G);
+  const range = 32 * Math.max(0, hang - 0.3) * (0.8 + rnd(G) * 0.4) * glove(G) * posGlove(G, best);
   R.catcher = best;
   const idq = !G.derby && !G.easy && G.outs < 2 && G.bases[0] && dist < 150 && bd < range;   // 내야 뜬공·직선타 + 1루 주자: 일부러 떨어뜨릴 수 있는 공 (고의 낙구)
   if (idq && ang >= 24 && G.bases[1]) R.ifr = 1;                                             // 1·2루 + 내야 뜬공 = 인필드 플라이
@@ -883,7 +891,7 @@ function contact(G, e, d, pos) {
     R.pending = 1; return R;
   }
   if (bd < range && errOf(G)) { R.bases = dist > 250 ? 2 : 1; R.kind = R.bases === 2 ? 'double' : 'single'; R.err = 1; R.text = '실책! 공을 떨어뜨렸어요'; R.chase = 1; }
-  else if (bd < range) { R.out = 1; R.kind = ang >= 24 ? (dist < 130 ? 'popup' : 'fly') : 'liner'; R.text = ang >= 24 ? (dist < 130 ? '내야 플라이 아웃' : '플라이 아웃') : '직선타 아웃'; }
+  else if (bd < range) { R.out = 1; R.kind = ang >= 24 ? (dist < 130 ? 'popup' : 'fly') : 'liner'; R.text = FNAME[best] + ' ' + (ang >= 24 ? '플라이 아웃' : '직선타 아웃'); }
   else { R.bases = hitOf(); if (btype(G) === 3 && R.bases === 1 && dist > 200 && rnd(G) < 0.35) R.bases = 2; R.kind = ['', 'single', 'double', 'triple'][R.bases]; R.text = ['', '안타!', '2루타!', '3루타!!'][R.bases]; R.catcher = best; R.chase = 1; }
   return R;
 }
@@ -1015,8 +1023,8 @@ function finishFly(G) {
   R.pending = 0; R.fl = [F2.fx, F2.fy, F2.fi]; R.catcher = F2.fi; G.fly = null;
   if (d <= CATCH_R && F2.idrop) { R.out = 1; R.kind = 'idrop'; R.text = R.ifr ? '🙅 인필드 플라이 선언! 떨어뜨려도 타자 아웃' : '🙅 고의 낙구! 타자 아웃 · 주자는 제자리'; }
   else if (d <= CATCH_R && F2.err) { R.bases = R.dist > 250 ? 2 : 1; R.kind = R.bases === 2 ? 'double' : 'single'; R.err = 1; R.text = '실책! 공을 떨어뜨렸어요'; }
-  else if (d <= CATCH_R) { R.out = 1; R.kind = R.ang >= 24 ? (R.dist < 130 ? 'popup' : 'fly') : 'liner'; R.dive = d > 3.5 ? 1 : 0; R.text = R.dive ? '다이빙 캐치!! 아웃' : R.ifr ? '인필드 플라이! 타자 아웃' : R.ang >= 24 ? (R.dist < 130 ? '내야 플라이 아웃' : '플라이 아웃') : '직선타 아웃'; }
-  else { R.bases = F2.hb; if (F2.fast && R.bases === 1 && R.dist > 200) R.bases = 2; R.kind = ['', 'single', 'double', 'triple'][R.bases]; R.text = (d < CATCH_R + 6 ? '아깝다! ' : '') + ['', '안타!', '2루타!', '3루타!!'][R.bases]; R.chase = 1; }
+  else if (d <= CATCH_R) { R.out = 1; R.kind = R.ang >= 24 ? (R.dist < 130 ? 'popup' : 'fly') : 'liner'; R.dive = d > 3.5 ? 1 : 0; R.text = R.dive ? FNAME[F2.fi] + ' 다이빙 캐치!! 아웃' : R.ifr ? '인필드 플라이! 타자 아웃' : FNAME[F2.fi] + ' ' + (R.ang >= 24 ? '플라이 아웃' : '직선타 아웃'); }
+  else { R.bases = F2.hb; if (F2.fast && R.bases === 1 && R.dist > 200) R.bases = 2; R.kind = ['', 'single', 'double', 'triple'][R.bases]; R.text = (d < CATCH_R + 6 ? '아슬아슬! ' : '') + ['', '안타!', '2루타!', '3루타!!'][R.bases]; R.chase = 1; }
   finishPA(G, R);
 }
 function steal(G, bl) {
@@ -1179,10 +1187,17 @@ function gameOver(G) {
 // 선수 교체: cmd 0~2 = 벤치 선수 고르기, 3~11 = 그 선수를 몇 번 타순 자리에 넣을지
 // 공격 팀: 지금 타자(대타) 또는 루에 있는 주자(대주자) 자리만 · 수비 팀: 아무 자리나(대수비) · 투구 전에만
 function doCmd(G, t, c) {
-  if (c >= 12 && c <= 17) {                                          // 투수 교체: 12·13 = 다음 불펜 (예전 방식) · 14~17 = 불펜 1~4번을 골라서
+  if (c >= 27 && c <= 35) {                                          // 🧤 수비 위치 바꾸기: 두 선수의 자리를 서로 바꿔요 (수비하는 팀만)
+    const a = c - 27; if (t !== pitTeam(G) || !G.pos) return;
+    if (G.pswap == null) G.pswap = [-1, -1];
+    const b = G.pswap[t]; if (b < 0 || b === a) { G.pswap[t] = a; return; }
+    G.pswap[t] = -1; const P = G.pos[t]; [P[a], P[b]] = [P[b], P[a]]; G.cat[t] = P.indexOf(0);
+    G.sub = { t, kind: '수비 위치 변경', swap: [b, a], tick: G.tick }; G.fx.sub++; return;
+  }
+  if ((c >= 12 && c <= 14) || (c >= 23 && c <= 26)) {               // 투수 교체: 12·13 = 다음 불펜 (예전 방식) · 23~26 = 불펜 1~4번을 골라서 (14는 예전 불펜 1번)
     if (t !== pitTeam(G) || G.pst[t].length > MAXRP) return;
     const pj = G.pj || (G.pj = [G.pst[0].map((_, i) => i), G.pst[1].map((_, i) => i)]);
-    let j = c >= 14 ? c - 13 : [1, 2, 3, 4].find(x => !pj[t].includes(x));
+    let j = c >= 23 ? c - 22 : c === 14 ? 1 : [1, 2, 3, 4].find(x => !pj[t].includes(x));
     if (!j || pj[t].includes(j)) return;
     const hand = c >= 14 ? (G.rph ? G.rph[t][j - 1] | 0 : 0) : c - 12, from = pIdx(G, t);
     G.phand[t] = hand; G.pst[t].push([hand, 0, 0, 0, 0, 0]); pj[t].push(j); G.ptype = 0;
@@ -1204,7 +1219,7 @@ function doCmd(G, t, c) {
 }
 function tick(G, inputs) {
   G.tick++;
-  if (G.phase === 'select') for (const t of [0, 1]) { const c = (inputs[t] || IDLE).cmd; if (c === 15) reqIBB(G, t); else if (c !== undefined && c >= 0 && c < 15) doCmd(G, t, c); }
+  if (G.phase === 'select') for (const t of [0, 1]) { const c = (inputs[t] || IDLE).cmd; if (c === 15) reqIBB(G, t); else if (c !== undefined && ((c >= 0 && c < 15) || (c >= 23 && c <= 35))) doCmd(G, t, c); }
   if ((G.phase === 'select' || G.phase === 'aim') && !G.easy && !G.derby) { const c = (inputs[batTeam(G)] || IDLE).cmd; if (c >= 16 && c <= 22 && modeOK(G, c - 16)) G.bmode = c - 16; }   // 작전 바로 고르기 (숫자키·작전 카드)
   const pin = inputs[pitTeam(G)] || IDLE, bin = inputs[batTeam(G)] || IDLE;
   // 타자는 언제든 방망이 위치를 옮길 수 있음
@@ -1520,7 +1535,7 @@ function createRollback(match, me, send, sendSync) {
       const f = m.s + i;
       if (f <= rb.upTo || rb.inp[rb.rem][f] !== undefined) continue;
       const c = d.charCodeAt(i) - 65;
-      if (!(c >= 0 && c < 41)) continue;
+      if (!(c >= 0 && c < 58)) continue;
       rb.inp[rb.rem][f] = c;
       if (f < rb.frame && rb.used[f] !== c) rb.rollFrom = Math.min(rb.rollFrom, f);
     }
@@ -1590,7 +1605,7 @@ function viewFromGame(G, a) {
   return {
     phase: G.phase, timer: G.timer, inning: G.inning, innings: G.innings, half: G.half, outs: G.outs, balls: G.balls, strikes: G.strikes,
     bases: G.bases, def: G.def, hand: G.hand, phand: G.phand, assist: G.assist, bmode: G.bmode, lu: G.lu, bo: G.bo, src: G.src, bench: G.bench, used: G.used, sub: G.sub, tick: G.tick, hitR: G.hitR, win: G.win, score: G.score, hits: G.hits, line: G.line, ptype: G.ptype, tu: G.tu, tv: G.tv, cu: G.cu, cv: G.cv, ball: G.ball,
-    swing: G.swing, res: G.res, pitchN: G.pitchN, pst: G.pst, pj: G.pj, st: G.st, errs: G.errs, derby: G.derby, dleft: G.dleft, park: G.park, fence: G.fence, tb: G.tb, close: G.close, chal: G.chal, cat: G.cat, easy: G.easy, tut: G.tut, prp: G.prp, pfm: G.pfm, wx: G.wx, fly: G.fly, spray: G.spray, lhr: G.lhr, cold: G.cold, rd: G.rd, pc: G.pc, pclock: G.pclock, ibbq: G.ibbq, ct: G.ct, winner: G.winner, rate: G.rate, fx: G.fx, bat: batTeam(G), pit: pitTeam(G)
+    swing: G.swing, res: G.res, pitchN: G.pitchN, pst: G.pst, pj: G.pj, st: G.st, errs: G.errs, derby: G.derby, dleft: G.dleft, park: G.park, fence: G.fence, tb: G.tb, close: G.close, chal: G.chal, cat: G.cat, pos: G.pos, easy: G.easy, tut: G.tut, prp: G.prp, pfm: G.pfm, wx: G.wx, fly: G.fly, spray: G.spray, lhr: G.lhr, cold: G.cold, rd: G.rd, pc: G.pc, pclock: G.pclock, ibbq: G.ibbq, ct: G.ct, winner: G.winner, rate: G.rate, fx: G.fx, bat: batTeam(G), pit: pitTeam(G)
   };
 }
 
@@ -1610,8 +1625,8 @@ const Settings = (() => {
     if (!(d['tcol' + t] >= 0 && d['tcol' + t] < TCOLS.length)) d['tcol' + t] = t;
     if (!Array.isArray(d['ppn' + t])) d['ppn' + t] = []; while (d['ppn' + t].length < 5) d['ppn' + t].push(''); d['ppn' + t].length = 5;
     if (!(d['cat' + t] >= 0 && d['cat' + t] <= 8)) d['cat' + t] = 7;
-    if (!Array.isArray(d['rot' + t])) d['rot' + t] = []; while (d['rot' + t].length < 5) d['rot' + t].push({ n: '', h: 0, f: 0, p: 15 }); d['rot' + t].length = 5;   // 🎲 선발 로테이션 5명
-    d['rot' + t] = d['rot' + t].map(r => ({ n: String((r && r.n) || '').slice(0, 6), h: r && r.h === 1 ? 1 : 0, f: r && r.f >= 0 && r.f <= 2 ? r.f | 0 : 0, p: (r && r.p | 1) || 15 }));
+    if (!Array.isArray(d['rot' + t])) d['rot' + t] = []; while (d['rot' + t].length < 5) d['rot' + t].push({ n: '', u: '', h: 0, f: 0, p: 15 }); d['rot' + t].length = 5;   // 🎲 선발 로테이션 5명
+    d['rot' + t] = d['rot' + t].map(r => ({ u: String((r && r.u) || '').replace(/\D/g, '').slice(0, 2), n: String((r && r.n) || '').slice(0, 6), h: r && r.h === 1 ? 1 : 0, f: r && r.f >= 0 && r.f <= 2 ? r.f | 0 : 0, p: (r && r.p | 1) || 15 }));
     if (d['rotOn' + t] !== 1) d['rotOn' + t] = 0; if (!Array.isArray(d['rotBag' + t])) d['rotBag' + t] = [];
     if (!(d.wx >= 0 && d.wx <= 4)) d.wx = 0;
     if (d.easy !== 0 && d.easy !== 1) d.easy = 1;
@@ -1622,7 +1637,7 @@ const Settings = (() => {
     if (!Array.isArray(d['rph' + t])) d['rph' + t] = []; while (d['rph' + t].length < 4) d['rph' + t].push(DEF_RPH[d['rph' + t].length]); d['rph' + t].length = 4;
     if (Array.isArray(d['lu' + t]) && d['lu' + t].length === 9 && Array.isArray(d['bn' + t]) && d['bn' + t].length === 3) capTypes(d['lu' + t], d['bn' + t]);
   }
-  for (const t of [0, 1]) { if (!Array.isArray(d['pcol' + t]) || d['pcol' + t].length !== 12) d['pcol' + t] = Array(12).fill(-1); if (!Array.isArray(d['pnum' + t]) || d['pnum' + t].length !== 12) d['pnum' + t] = Array(12).fill(''); }
+  for (const t of [0, 1]) { if (!Array.isArray(d['pcol' + t]) || d['pcol' + t].length !== 12) d['pcol' + t] = Array(12).fill(-1); d['pnum' + t] = pnumFix(d['pnum' + t]); if (!posOk(d['pos' + t])) d['pos' + t] = posDefault(d['cat' + t]); d['cat' + t] = d['pos' + t].indexOf(0); }
   for (const t of [0, 1]) { if (!Array.isArray(d['lu' + t]) || d['lu' + t].length !== 9) d['lu' + t] = DEFAULT_LU.slice(); if (!Array.isArray(d['pn' + t]) || d['pn' + t].length !== 9) d['pn' + t] = Array(9).fill(''); if (!Array.isArray(d['bn' + t]) || d['bn' + t].length !== 3) d['bn' + t] = DEFAULT_BENCH.slice(); if (!Array.isArray(d['bpn' + t]) || d['bpn' + t].length !== 3) d['bpn' + t] = Array(3).fill(''); if (!Array.isArray(d['bh' + t]) || d['bh' + t].length !== 9) d['bh' + t] = [1, 0, 2, 0, 1, 0, 0, 0, 1]; if (!Array.isArray(d['bbh' + t]) || d['bbh' + t].length !== 3) d['bbh' + t] = [0, 1, 0]; d['ph' + t] = (d['ph' + t] | 0) % 2; }
   return d;
 })();
@@ -2123,6 +2138,11 @@ function badge(x, y, r, t, full) { crestTo(ctx, x, y, r, t, full, LOGOS[Logos[t]
 // 선수 이름: 원래 타순(0~8) 또는 벤치(9~11)
 let PCol = [[], []], PNum = [[], []], Mgrs = ['', ''], TutMark = null;
 const pSkin = (t, src) => { const c = PCol[t] ? PCol[t][src] : -1; return c >= 0 && SKINS[c] ? SKINS[c] : skinOf(t); };
+const fNum = (v, t, i) => {                                           // 수비수 등번호: 투수는 투수 등번호, 나머지는 그 자리 선수 등번호
+  if (i === 0) { const n = PNum[t] ? PNum[t][12 + (v.pst ? vpj(v, t) : 0)] : ''; return n ? String(n) : '1'; }
+  const s = v.pos ? v.pos[t].indexOf(i - 1) : -1; return s < 0 ? String(i + 1) : pNum(t, v.src[t][s], s);
+};
+const fSkin = (v, t, i) => { const s = i > 0 && v.pos ? v.pos[t].indexOf(i - 1) : -1; return s >= 0 ? pSkin(t, v.src[t][s]) : skinOf(t); };
 const pNum = (t, src, slot) => { const n = PNum[t] ? PNum[t][src] : ''; return n !== undefined && n !== null && n !== '' ? String(n) : String(slot + 1); };
 function nameOf(t, src) {
   if (src < 9) return (PNames[t] && PNames[t][src]) || `선수${src + 1}`;
@@ -2266,12 +2286,13 @@ function render(v, now, dt) {
   }
   if (v.phase === 'change') outlined(v.derby ? `${Names[v.bat]} 차례!` : '공수 교대!', HALF, cy - 20, 24, '#fff', '#111');
   if (v.sub && v.phase !== 'result' && v.tick - v.sub.tick < v.rate * 2.5 && v.tick >= v.sub.tick) {
-    const S2 = v.sub, ty = S2.pitcher ? null : BTYPES[v.lu[S2.t][S2.slot]];
+    const S2 = v.sub, ty = S2.pitcher || S2.swap ? null : BTYPES[v.lu[S2.t][S2.slot]];
     ctx.fillStyle = 'rgba(20,20,30,.8)'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(HALF - 120, 56, 240, 34, 9) : ctx.rect(HALF - 120, 56, 240, 34); ctx.fill();
     ctx.fillStyle = TEAM_COL[S2.t]; ctx.fillRect(HALF - 120, 56, 5, 34);
     outlined(`🔄 ${S2.kind}!`, HALF, 66, 11, '#63e6be', '#111');
     if (S2.pitcher) outlined(`${pitName(S2.t, S2.from)} → ${pitName(S2.t, S2.to)} (${S2.hand ? '좌투' : '우투'}) 등판!`, HALF, 81, 9, '#fff', '#111');
-    else outlined(`${S2.slot + 1}번 ${nameOf(S2.t, S2.from)} → ${nameOf(S2.t, S2.to)} ${ty.icon}${ty.name}`, HALF, 81, 9, '#fff', '#111');
+    else if (S2.swap) { const [a, b] = S2.swap, P = v.pos ? v.pos[S2.t] : []; outlined(`${nameOf(S2.t, v.src[S2.t][a])} ${POSN[P[a]] || ''} ↔ ${nameOf(S2.t, v.src[S2.t][b])} ${POSN[P[b]] || ''}`, HALF, 81, 9, '#fff', '#111'); }
+    else outlined(`${S2.slot + 1}번 ${nameOf(S2.t, S2.from)} → ${nameOf(S2.t, S2.to)} ${ty.icon}${ty.name}${v.pos ? ' (' + POSN[v.pos[S2.t][S2.slot]] + ')' : ''}`, HALF, 81, 9, '#fff', '#111');
   }
   if (v.phase === 'result' && v.res && !(v.res.bench && ((v.res.BT || 0) - v.timer) > v.rate * 0.9)) {
     const R2 = v.res, big = R2.kind === 'hr' || R2.kind === 'triple' || R2.kind === 'double' || R2.kind === 'single' || R2.kind === 'k';
@@ -2550,7 +2571,7 @@ function drawPlay(v, now) {
     let q = fpos(p[0], p[1]);
     if (Rr.fl && i === Rr.fl[2] && !C.rep) q = [HOME[0] + Rr.fl[0] * FK, HOME[1] + Rr.fl[1] * FK];
     else if (i === catcher) { const k2 = Math.min(1, t / (T * 0.55)) * reachK; q = [q[0] + (end[0] - q[0]) * k2, q[1] + (end[1] - q[1]) * k2]; }
-    drawCat(q[0], q[1] + 6, 0.5, skinOf(v.pit), v.pit, { glove: 1, num: String(i + 1), run: i === catcher ? now / 60 : 0 });
+    drawCat(q[0], q[1] + 6, 0.5, fSkin(v, v.pit, i), v.pit, { glove: 1, num: fNum(v, v.pit, i), run: i === catcher ? now / 60 : 0 });
   });
   // 주자
   const rp = Math.min(1, Math.max(0, (t - T * 0.15) / (T * 0.6)));
@@ -2582,7 +2603,7 @@ function drawFieldPhase(v, now) {
   fielders(v.def[v.pit]).forEach((p, i) => {
     const me = i === F2.fi, q = me ? sp(F2.fx, F2.fy) : fpos(p[0], p[1]);
     if (me) { ctx.strokeStyle = TEAM_COL[v.pit]; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(q[0], q[1] + 6, 9, 4, 0, 0, 7); ctx.stroke(); }
-    drawCat(q[0], q[1] + 6, me ? 0.62 : 0.5, skinOf(v.pit), v.pit, { glove: me ? 1.2 : 1, num: String(i + 1), run: me && F2.f > 5 ? now / 50 : 0 });
+    drawCat(q[0], q[1] + 6, me ? 0.62 : 0.5, fSkin(v, v.pit, i), v.pit, { glove: me ? 1.2 : 1, num: fNum(v, v.pit, i), run: me && F2.f > 5 ? now / 50 : 0 });
   });
   v.bases.forEach((on, i) => { if (on) { const p = BASE_P[i + 1], sc = v.src[v.bat][on - 1]; drawCat(p[0], p[1] + 6, 0.55, pSkin(v.bat, sc), v.bat, { num: pNum(v.bat, sc, on - 1) }); } });
   const x = HOME[0] + (L[0] - HOME[0]) * k, y = HOME[1] + (L[1] - HOME[1]) * k, hgt = Math.sin(k * Math.PI) * Math.min(60, Rr.dist * Math.max(0.1, Rr.ang) / 300) + (1 - k) * 4;
@@ -2659,7 +2680,7 @@ function drawStand(v, now) {
   ctx.strokeStyle = 'rgba(255,255,255,.4)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(HOME[0], HOME[1]); ctx.lineTo(...fpos(-45, 150)); ctx.moveTo(HOME[0], HOME[1]); ctx.lineTo(...fpos(45, 150)); ctx.stroke();
   // 수비수 9명 · 주자 · 타자
   const fld = fielders(v.def[pit]);
-  fld.forEach((p, i) => { const q = fpos(p[0], p[1]); drawCat(q[0], q[1] + 6, 0.5, skinOf(pit), pit, { glove: 1, num: String(i + 1), arm: i === 0 && v.phase === 'pitch' && bl ? Math.min(1, 0.3 + bl.f / 8) : 0.1 }); });
+  fld.forEach((p, i) => { const q = fpos(p[0], p[1]); drawCat(q[0], q[1] + 6, 0.5, fSkin(v, pit, i), pit, { glove: 1, num: fNum(v, pit, i), arm: i === 0 && v.phase === 'pitch' && bl ? Math.min(1, 0.3 + bl.f / 8) : 0.1 }); });
   v.bases.forEach((on, i) => { if (on) { const p = BASE_P[i + 1], sc = v.src[bat][on - 1], lead = v.phase === 'pitch' && v.bmode >= 2 && bl && bl.f > 6 ? Math.min(1, bl.f / bl.t) * 0.5 : 0, p2 = BASE_P[i + 2] || BASE_P[4]; drawCat(p[0] + (p2[0] - p[0]) * lead, p[1] + (p2[1] - p[1]) * lead + 6, 0.55, pSkin(bat, sc), bat, { num: pNum(bat, sc, on - 1), run: lead ? now / 50 : 0 }); } });
   const bh = v.hand[bat][v.bo[bat]], lefty = bh === 2 ? v.phand[pit] === 0 : bh === 1, bsrc = v.src[bat][v.bo[bat]];
   let batA = 0; if (v.swing >= 0 && bl) batA = Math.min(1, Math.max(0, (bl.f - v.swing) / SWING_T));
@@ -2765,7 +2786,7 @@ function startDemo() {
 }
 function setSkins(n) { PkcT = [pkcOf(0), pkcOf(1)]; Skins = Settings.skins.slice(0, 2); Names = [teamName(0), teamName(1)]; Logos = [Settings.logo0 | 0, Settings.logo1 | 0]; PNames = [Settings.pn0.slice(), Settings.pn1.slice()]; BNames = [Settings.bpn0.slice(), Settings.bpn1.slice()]; PCol = [Settings.pcol0.slice(), Settings.pcol1.slice()]; PNum = [Settings.pnum0.slice(), Settings.pnum1.slice()]; Mgrs = [String(Settings.mgr0 || ''), String(Settings.mgr1 || '')]; LStyles = [Settings.lsty0 | 0, Settings.lsty1 | 0]; PitNames = [Settings.ppn0.slice(), Settings.ppn1.slice()]; PCer = [Settings.cer0.slice(), Settings.cer1.slice()]; PSong = [Settings.sng0.slice(), Settings.sng1.slice()]; applyCols(Settings.tcol0, Settings.tcol1); }
 let PNames = [[], []], BNames = [[], []];
-const gameOpt = kind => ({ lu0: luEncode(Settings.lu0), lu1: luEncode(Settings.lu1), bn0: luEncode(Settings.bn0), bn1: luEncode(Settings.bn1), diff0: Settings.bdiff, diff1: kind === 'cpu' ? ({ veasy: 3, easy: 2, normal: 2, hard: 1 }[Settings.cpu] ?? 2) : Settings.bdiff, bspd: Settings.bspd | 0, park: Settings.park | 0, rp0: rphBits(Settings.rph0), rp1: rphBits(Settings.rph1), cat0: Settings.cat0 | 0, cat1: Settings.cat1 | 0, wx: Settings.wx | 0, easy: Settings.easy ? 1 : 0, pr0: prepEncode(Settings.prep0), pr1: prepEncode(Settings.prep1), pf0: handEncode(Settings.pform0), pf1: handEncode(Settings.pform1), bh0: handEncode(Settings.bh0), bh1: handEncode(Settings.bh1), bbh0: handEncode(Settings.bbh0), bbh1: handEncode(Settings.bbh1), ph0: Settings.ph0 | 0, ph1: Settings.ph1 | 0, pc: Settings.pclock ? 1 : 0, bc: Settings.bclear === 0 ? 0 : 1 });
+const gameOpt = kind => ({ lu0: luEncode(Settings.lu0), lu1: luEncode(Settings.lu1), bn0: luEncode(Settings.bn0), bn1: luEncode(Settings.bn1), diff0: Settings.bdiff, diff1: kind === 'cpu' ? ({ veasy: 3, easy: 2, normal: 2, hard: 1 }[Settings.cpu] ?? 2) : Settings.bdiff, bspd: Settings.bspd | 0, park: Settings.park | 0, rp0: rphBits(Settings.rph0), rp1: rphBits(Settings.rph1), cat0: posEnc(Settings.pos0), cat1: posEnc(Settings.pos1), wx: Settings.wx | 0, easy: Settings.easy ? 1 : 0, pr0: prepEncode(Settings.prep0), pr1: prepEncode(Settings.prep1), pf0: handEncode(Settings.pform0), pf1: handEncode(Settings.pform1), bh0: handEncode(Settings.bh0), bh1: handEncode(Settings.bh1), bbh0: handEncode(Settings.bbh0), bbh1: handEncode(Settings.bbh1), ph0: Settings.ph0 | 0, ph1: Settings.ph1 | 0, pc: Settings.pclock ? 1 : 0, bc: Settings.bclear === 0 ? 0 : 1 });
 const teamName = i => (String(Settings['team' + i] || '').trim() || ['치즈 타이거즈', '블루 라이언즈'][i]).slice(0, 8);
 let series = [0, 0], lastKind = null, lastN = 2;   // 연속 경기 전적, 마지막으로 한 모드
 function rotApply(t) {                                                    // 🎲 로테이션이 켜져 있으면 오늘 선발을 뽑아 선발 자리에 넣어요
@@ -2773,7 +2794,7 @@ function rotApply(t) {                                                    // �
   let bag = (Settings['rotBag' + t] || []).filter(x => x >= 0 && x < 5);
   if (!bag.length) { bag = [0, 1, 2, 3, 4]; for (let i = 4; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [bag[i], bag[j]] = [bag[j], bag[i]]; } }   // 5명이 한 번씩 돌아가며 (순서는 무작위)
   const r = bag.pop(), P = Settings['rot' + t][r];
-  Settings['rotBag' + t] = bag; Settings['ppn' + t][0] = P.n || `선발${r + 1}`; Settings['ph' + t] = P.h; Settings['pform' + t][0] = P.f; Settings['prep' + t][0] = P.p | 1;
+  Settings['rotBag' + t] = bag; Settings['ppn' + t][0] = P.n || `선발${r + 1}`; Settings['pnum' + t] = pnumFix(Settings['pnum' + t]); Settings['pnum' + t][12] = P.u || ''; Settings['ph' + t] = P.h; Settings['pform' + t][0] = P.f; Settings['prep' + t][0] = P.p | 1;
   saveSettings(); return Settings['ppn' + t][0];
 }
 function rotToast(ts) { const s = ts.map(t => rotApply(t)).filter(Boolean); if (s.length) toast(`🎲 오늘 선발: ${s.join(' vs ')}`); }
@@ -2809,7 +2830,7 @@ function buildTeamScreen() {
         const fv = Settings['pform' + t][j] | 0, pm = Settings['prep' + t][j] | 1;
         return `<div class="row9" style="grid-template-columns:44px 1fr 62px 86px;margin-top:6px"><span>${j === 0 ? '선발' : '불펜' + j}</span><input data-k="ppn" data-t="${t}" data-i="${j}" maxlength="6" placeholder="${pName(j)}" value="${esc(Settings['ppn' + t][j] || '')}"><select ${hk}><option value="0"${hv === 0 ? ' selected' : ''}>우투</option><option value="1"${hv === 1 ? ' selected' : ''}>좌투</option></select><select data-k="pform" data-t="${t}" data-i="${j}">${['오버', '사이드', '언더'].map((f, k) => `<option value="${k}"${fv === k ? ' selected' : ''}>${f}</option>`).join('')}</select></div>` +
           `<div class="pchips" data-t="${t}" data-j="${j}">${PITCHES.map((P, b) => `<button type="button" class="pc${pm >> b & 1 ? ' on' : ''}" data-prep="${t},${j},${b}">${P.name}</button>`).join('')}</div>`; }).join('') +
-      `<div class="row9" style="grid-template-columns:44px 1fr;margin-top:6px"><span>🧤포수</span><select data-k="cat" data-t="${t}">${[...Array(9).keys()].map(i => `<option value="${i}"${(Settings['cat' + t] | 0) === i ? ' selected' : ''}>${i + 1}번 ${esc(Settings['pn' + t][i] || '선수' + (i + 1))} ${BTYPES[Settings['lu' + t][i] | 0].icon}${BTYPES[Settings['lu' + t][i] | 0].name}</option>`).join('')}</select></div><div class="cattip" style="font-size:12px;color:#5f3dc4;margin:2px 0 0 48px"></div>` +
+      
       `<div class="capline" style="font-size:12px;color:#8a6d3b;margin:6px 0 2px;text-align:center"></div>`;
     for (let i = 0; i < 9; i++) {
       const ty = Settings['lu' + t][i] | 0;
@@ -2823,13 +2844,23 @@ function buildTeamScreen() {
       html += `<div class="row9"><span>후보</span><input data-k="bpn" data-t="${t}" data-i="${j}" maxlength="6" placeholder="후보 ${j + 1}" value="${esc(Settings['bpn' + t][j] || '')}"><select class="hs" data-k="bbh" data-t="${t}" data-i="${j}">${['우타', '좌타', '양타'].map((h, k) => `<option value="${k}"${(Settings['bbh' + t][j] | 0) === k ? ' selected' : ''}>${h}</option>`).join('')}</select>` +
         `<select data-k="bn" data-t="${t}" data-i="${j}">${BTYPES.map((b, k) => `<option value="${k}"${ty === k ? ' selected' : ''}>${b.icon} ${b.name}</option>`).join('')}</select></div>`;
     }
+    {                                                                      // 🧤 수비 위치 · 🔢 등번호
+      const P = Settings['pos' + t], nm = i => esc(Settings['pn' + t][i] || '선수' + (i + 1)), num = (j, ph) => `<input type="text" inputmode="numeric" data-k="pnum" data-t="${t}" data-i="${j}" maxlength="2" placeholder="${ph}" value="${esc(Settings['pnum' + t][j] || '')}">`;
+      html += `<details class="cus pos" open><summary>🧤 수비 위치 · 🔢 등번호</summary><div style="font-size:12px;color:#8a6d3b;margin:4px 0">자리를 바꾸면 그 자리에 있던 선수와 서로 바뀌어요 · 🧤수비왕을 공이 많이 가는 자리(유격수·중견수)에 두면 더 잘 잡아요 · 지명타자는 수비에 안 나가요 · 등번호를 비워 두면 타순 번호가 달려요</div>`;
+      for (let i = 0; i < 9; i++) html += `<div class="row9" style="grid-template-columns:1fr 92px 46px"><span class="posl" data-i="${i}" style="text-align:left">${i + 1}번 ${nm(i)} ${BTYPES[Settings['lu' + t][i] | 0].icon}</span><select data-k="pos" data-t="${t}" data-i="${i}">${POSN.map((n, k) => `<option value="${k}"${P[i] === k ? ' selected' : ''}>${n}</option>`).join('')}</select>${num(i, i + 1)}</div>`;
+      html += `<div class="cattip" style="font-size:12px;color:#5f3dc4;margin:2px 0 6px"></div>`;
+      for (let j = 0; j < 3; j++) html += `<div class="row9" style="grid-template-columns:1fr 46px"><span style="text-align:left">후보 ${esc(Settings['bpn' + t][j] || String(j + 1))}</span>${num(9 + j, '-')}</div>`;
+      for (let j = 0; j < 5; j++) html += `<div class="row9" style="grid-template-columns:1fr 46px"><span style="text-align:left">⚾ ${j ? '불펜' + j : '선발'} ${esc(Settings['ppn' + t][j] || pName(j))}</span>${num(12 + j, j ? '-' : '1')}</div>`;
+      if (Settings['rotOn' + t]) html += `<div style="font-size:12px;color:#8a6d3b;margin:4px 0 2px">🎲 선발 로테이션 등번호 (뽑힌 투수 번호가 위 '선발'에 들어가요)</div>` + Settings['rot' + t].map((R2, j) => `<div class="row9" style="grid-template-columns:1fr 46px"><span style="text-align:left">선발${j + 1} ${esc(R2.n || '')}</span><input type="text" inputmode="numeric" data-k="ru" data-t="${t}" data-i="${j}" maxlength="2" placeholder="-" value="${esc(R2.u || '')}"></div>`).join('');
+      html += `</details>`;
+    }
     const COLE = ['🟠', '🔵', '⚫', '⚪', '🟤', '🩷', '🟢', '🟣'];
-    html += `<details class="cus"><summary>🎨 선수 꾸미기 (고양이 색 · 등번호)</summary><div style="font-size:12px;color:#8a6d3b;margin:4px 0">선수마다 이름 · 등번호 · 고양이 색, 그 아래 줄에 🎉 홈런 세리머니 · 🎵 타석 응원가 (고르면 미리 들려줘요) · 등번호를 비워 두면 타순 번호가 달려요 · 색은 "팀 색"이면 위에서 고른 팀 고양이 색</div>`;
+    html += `<details class="cus"><summary>🎨 선수 꾸미기 (고양이 색 · 세리머니 · 응원가)</summary><div style="font-size:12px;color:#8a6d3b;margin:4px 0">선수마다 고양이 색, 그 아래 줄에 🎉 홈런 세리머니 · 🎵 타석 응원가 (고르면 미리 들려줘요) · 색은 "팀 색"이면 위에서 고른 팀 고양이 색 · 등번호는 위 🧤 수비 위치 칸에서</div>`;
     for (let j = 0; j < 12; j++) {
       const c0 = Settings['pcol' + t][j] | 0, lab = j < 9 ? `${j + 1}번 ${esc(Settings['pn' + t][j] || '선수' + (j + 1))}` : `후보 ${esc(Settings['bpn' + t][j - 9] || String(j - 8))}`;
       const cr = Settings['cer' + t][j] | 0, sg = Settings['sng' + t][j] | 0;
       const xrow = `<div class="row9" style="grid-template-columns:1fr 1fr;margin:0 0 8px"><select data-k="cer" data-t="${t}" data-i="${j}" title="홈런 세리머니">${CERS.map((c, k) => `<option value="${k}"${cr === k ? ' selected' : ''}>${c}</option>`).join('')}</select><select data-k="sng" data-t="${t}" data-i="${j}" title="타석 응원가">${WALKUP.map((w, k) => `<option value="${k}"${sg === k ? ' selected' : ''}>🎵 ${w}</option>`).join('')}</select></div>`;
-      html += `<div class="row9" style="grid-template-columns:1fr 54px 112px"><span style="text-align:left">${lab}</span><input type="text" inputmode="numeric" data-k="pnum" data-t="${t}" data-i="${j}" maxlength="2" placeholder="${j < 9 ? j + 1 : '-'}" value="${esc(Settings['pnum' + t][j] || '')}"><select data-k="pcol" data-t="${t}" data-i="${j}"><option value="-1"${c0 < 0 ? ' selected' : ''}>팀 색</option>${SKINS.map((S, k) => `<option value="${k}"${c0 === k ? ' selected' : ''}>${COLE[k]} ${S.name}</option>`).join('')}</select></div>` + xrow;
+      html += `<div class="row9" style="grid-template-columns:1fr 112px"><span style="text-align:left">${lab}</span><select data-k="pcol" data-t="${t}" data-i="${j}"><option value="-1"${c0 < 0 ? ' selected' : ''}>팀 색</option>${SKINS.map((S, k) => `<option value="${k}"${c0 === k ? ' selected' : ''}>${COLE[k]} ${S.name}</option>`).join('')}</select></div>` + xrow;
     }
     html += `</details>`;
     el.innerHTML = html;
@@ -2869,13 +2900,14 @@ function initTeamInputs() {
     else if (k === 'rn') Settings['rot' + t][i].n = e.target.value.slice(0, 6);
     else if (k === 'rh') Settings['rot' + t][i].h = +e.target.value;
     else if (k === 'rf') Settings['rot' + t][i].f = +e.target.value;
-    else if (k === 'cat') Settings['cat' + t] = +e.target.value;
+    else if (k === 'pos') { const P = Settings['pos' + t], v = +e.target.value, j = P.indexOf(v); if (j >= 0 && j !== i) { P[j] = P[i]; P[i] = v; Settings['cat' + t] = P.indexOf(0); saveSettings(); buildTeamScreen(); updTypeCaps(0); updTypeCaps(1); drawCrests(); return; } }
+    else if (k === 'ru') { const v2 = e.target.value.replace(/\D/g, '').slice(0, 2); if (v2 !== e.target.value) e.target.value = v2; Settings['rot' + t][i].u = v2; }
     else if (k === 'pform') Settings['pform' + t][i] = +e.target.value;
     else if (k === 'cer') Settings['cer' + t][i] = +e.target.value;
     else if (k === 'sng') { Settings['sng' + t][i] = +e.target.value; if (+e.target.value) { Sound.get(); const m = Settings.music; Settings.music = true; Music.song('w' + e.target.value, true); Settings.music = m; } }
-    if (k === 'cat' || k === 'pn') updTypeCaps(t);
+    if (k === 'pos' || k === 'pn') updTypeCaps(t);
     if (k === 'lu' || k === 'bn') { const n = typeCount(t), tv = +e.target.value; if (tv > 0 && n[tv] > TYPE_CAP[tv]) { toast(`${BTYPES[tv].name}는 팀에 ${TYPE_CAP[tv]}명까지예요`); Settings[k + t][i] = 0; e.target.value = '0'; } updTypeCaps(t); }
-    else if (k === 'pnum') { const v2 = e.target.value.replace(/\D/g, '').slice(0, 2); if (v2 !== e.target.value) e.target.value = v2; Settings['pnum' + t][i] = v2; }
+    else if (k === 'pnum') { const v2 = e.target.value.replace(/\D/g, '').slice(0, 2); if (v2 !== e.target.value) e.target.value = v2; Settings['pnum' + t] = pnumFix(Settings['pnum' + t]); Settings['pnum' + t][i] = v2; }
     else if (k === 'pcol') Settings['pcol' + t][i] = +e.target.value;
     saveSettings(); updContinue(); updTeamBtn(); if (k === 'team' || k === 'logo' || k === 'tcol' || k === 'lsty') drawCrests();
   });
@@ -3008,7 +3040,7 @@ function boxHTML(v) {
     h += `<div style="margin:8px 0 2px;font-weight:bold;color:${TEAM_COL[t]}">${LOGOS[Logos[t]] || ''} ${esc(Names[t])}</div><table style="border-collapse:collapse;width:100%"><tr><th style="${th};text-align:left">타자</th><th style="${th}">타수</th><th style="${th}">안타</th><th style="${th}">홈런</th><th style="${th}">타점</th><th style="${th}">득점</th><th style="${th}">볼넷</th><th style="${th}">삼진</th></tr>`;
     v.st[t].forEach((S, src) => {
       if (src >= 9 && !S.some(x => x)) return;
-      h += `<tr><td style="${td};text-align:left">${src < 9 ? src + 1 + '. ' : '↳ '}${esc(nameOf(t, src))}${v.cat && src === v.src[t][v.cat[t]] ? ' <small>(포수)</small>' : ''}</td>${S.map((x, k) => `<td style="${td}">${k === 1 && x ? '<b>' + x + '</b>' : k === 2 && x ? '<b style="color:#e03131">' + x + '</b>' : x}</td>`).join('')}</tr>`;
+      h += `<tr><td style="${td};text-align:left">${src < 9 ? src + 1 + '. ' : '↳ '}${esc(nameOf(t, src))}${v.pos && src === v.src[t][v.pos[t].indexOf(0)] ? ' <small>(포수)</small>' : v.pos && src < 9 && v.src[t][src] === src && v.pos[t][src] !== 0 ? ` <small>(${POSN[v.pos[t][src]]})</small>` : !v.pos && v.cat && src === v.src[t][v.cat[t]] ? ' <small>(포수)</small>' : ''}</td>${S.map((x, k) => `<td style="${td}">${k === 1 && x ? '<b>' + x + '</b>' : k === 2 && x ? '<b style="color:#e03131">' + x + '</b>' : x}</td>`).join('')}</tr>`;
     });
     h += '</table>';
     if (!v.derby) {
@@ -3192,7 +3224,7 @@ function openSub() {
   const g = isOnline() ? RB && RB.G : G; if (!g || g.phase !== 'select') { toast('투수가 공을 던지기 전에만 바꿀 수 있어요'); return; }
   const v = viewFromGame(g, 1), teams = subTeams(v);
   if (!teams.length) { toast('바꿀 수 있는 선수가 없어요'); return; }
-  const nm = (t, src) => esc(nameOf(t, src)), ty = tt => `${BTYPES[tt].icon}${BTYPES[tt].name}`;
+  const nm = (t, src) => esc(nameOf(t, src)), ty = tt => `${BTYPES[tt].icon}${BTYPES[tt].name}`, ps = (t, s) => v.pos ? ` <small>(${POSN[v.pos[t][s]]})</small>` : '';
   const benchBtns = (t, slot, label) => [0, 1, 2].filter(j => !v.used[t][j]).map(j =>
     `<button class="sb" data-sub="${t},${j},${slot}">${label} ${esc(nameOf(t, 9 + j))} ${ty(v.bench[t][j])}</button>`).join('');
   let html = '';
@@ -3200,8 +3232,8 @@ function openSub() {
     html += `<div class="subbox"><h3 style="color:${TEAM_COL[t]}">${LOGOS[Logos[t]]} ${esc(Names[t])} ${t === v.bat ? '(공격)' : '(수비)'}</h3>`;
     if (t === v.bat) {
       const s = v.bo[t];
-      html += `<div>🏏 <b>대타</b> — 지금 타자 ${s + 1}번 ${nm(t, v.src[t][s])} ${ty(v.lu[t][s])} 대신</div>${benchBtns(t, s, '→')}`;
-      v.bases.forEach((r, bi) => { if (r) html += `<div style="margin-top:6px">🏃 <b>대주자</b> — ${bi + 1}루 주자 ${r}번 ${nm(t, v.src[t][r - 1])} 대신</div>${benchBtns(t, r - 1, '→')}`; });
+      html += `<div>🏏 <b>대타</b> — 지금 타자 ${s + 1}번 ${nm(t, v.src[t][s])}${ps(t, s)} ${ty(v.lu[t][s])} 대신 <small style="color:#8a6d3b">(들어온 선수가 그 자리 수비도 맡아요)</small></div>${benchBtns(t, s, '→')}`;
+      v.bases.forEach((r, bi) => { if (r) html += `<div style="margin-top:6px">🏃 <b>대주자</b> — ${bi + 1}루 주자 ${r}번 ${nm(t, v.src[t][r - 1])}${ps(t, r - 1)} 대신</div>${benchBtns(t, r - 1, '→')}`; });
     } else {
       if (v.pst[t].length <= MAXRP) {
         const P = curP(v, t), n = v.pst[t].length;
@@ -3209,7 +3241,10 @@ function openSub() {
         html += `<div>⚾ <b>투수 교체</b> — 지금 ${esc(pitName(t, vpj(v, t)))} (${P[0] ? '좌투' : '우투'}) · ${P[1]}구 · 체력 ${Math.round(stamina(v, t) * 100)}%</div><div style="font-size:12px;color:#8a6d3b;margin:2px 0 4px">올릴 불펜 투수를 골라요 (한 번 내려간 투수는 다시 못 나와요)</div>` +
           free.map(j => `<button class="sb" data-pch="${t},${j}">→ ${esc(pitName(t, j))} (${rph[j - 1] | 0 ? '좌투' : '우투'})</button>`).join('') + '<div style="margin-bottom:8px"></div>';
       } else html += `<div style="font-size:13px;color:#8a6d3b;margin-bottom:6px">⚾ 구원 투수를 모두 썼어요</div>`;
-      if (v.used[t].some(u => !u)) html += `<div>🧤 <b>대수비</b> — 바꿀 자리: <select id="sub-slot-${t}">${v.lu[t].map((tt, i) => `<option value="${i}">${i + 1}번 ${nm(t, v.src[t][i])} ${ty(tt)}</option>`).join('')}</select></div>${benchBtns(t, -1, '→')}`;
+      const order = v.pos ? [0, 1, 2, 3, 4, 5, 6, 7].map(k => v.pos[t].indexOf(k)).filter(i => i >= 0) : [...Array(9).keys()];   // 포수 → 1루수 … 우익수 (지명타자는 수비 안 해요)
+      const opt = i => `<option value="${i}">${v.pos ? POSN[v.pos[t][i]] + ' — ' : ''}${i + 1}번 ${nm(t, v.src[t][i])} ${ty(v.lu[t][i])}</option>`;
+      if (v.used[t].some(u => !u)) html += `<div>🧤 <b>대수비</b> — 바꿀 자리: <select id="sub-slot-${t}">${order.map(opt).join('')}</select></div>${benchBtns(t, -1, '→')}`;
+      if (v.pos && !v.easy) html += `<div style="margin-top:8px">🔄 <b>수비 위치 바꾸기</b> — <select id="sw-a-${t}">${[...Array(9).keys()].map(opt).join('')}</select> ↔ <select id="sw-b-${t}">${[...Array(9).keys()].map(opt).join('').replace('<option value="1">', '<option value="1" selected>')}</select> <button class="sb" data-swap="${t}">서로 바꾸기</button></div><div style="font-size:12px;color:#8a6d3b">지명타자와 바꾸면 그 선수가 수비에 나가고, 원래 선수는 지명타자가 돼요</div>`;
     }
     html += '</div>';
   }
@@ -3217,9 +3252,15 @@ function openSub() {
   if (!isOnline()) paused = true;
   showScreen('sub');
 }
+document.addEventListener('click', e => {                                  // 🔄 수비 위치 바꾸기 (두 선수)
+  const b = e.target.closest && e.target.closest('[data-swap]'); if (!b) return;
+  const t = +b.dataset.swap, a = +($('#sw-a-' + t) || {}).value, c = +($('#sw-b-' + t) || {}).value;
+  if (!(a >= 0 && c >= 0) || a === c) { toast('서로 다른 두 선수를 골라 주세요'); return; }
+  cmdQ[t].push(27 + a, 27 + c); showScreen(null); if (!isOnline()) paused = false;
+});
 document.addEventListener('click', e => {
   const b = e.target.closest && e.target.closest('[data-pch]'); if (!b) return;
-  const [t, j] = b.dataset.pch.split(',').map(Number); cmdQ[t].push(13 + j);   // 14~17: 불펜 1~4번
+  const [t, j] = b.dataset.pch.split(',').map(Number); cmdQ[t].push(22 + j);   // 23~26: 불펜 1~4번
   showScreen(null); if (!isOnline()) paused = false;
 });
 document.addEventListener('click', e => {
@@ -3233,11 +3274,13 @@ document.addEventListener('click', e => {
 let LeagueMatch = null;
 const League = (() => { let d = null; try { d = JSON.parse(localStorage.getItem('nyangBaseballLeague') || 'null'); } catch (e) {} if (!d || !Array.isArray(d.teams) || !Array.isArray(d.games)) d = { teams: [], games: [], nid: 1 }; return d; })();
 function saveLeague() { try { localStorage.setItem('nyangBaseballLeague', JSON.stringify(League)); } catch (e) {} }
-const TEAM_KEYS = ['pkc', 'logo', 'lu', 'pn', 'bn', 'bpn', 'bh', 'bbh', 'ph', 'pcol', 'pnum', 'mgr', 'lsty', 'tcol', 'ppn', 'rph', 'cat', 'prep', 'pform', 'cer', 'sng'];
+function pnumFix(a) { a = Array.isArray(a) ? a.slice(0, 17).map(x => String(x == null ? '' : x).replace(/\D/g, '').slice(0, 2)) : []; while (a.length < 17) a.push(''); return a; }   // 등번호: 0~8 타순 · 9~11 후보 · 12 선발 · 13~16 불펜
+const TEAM_KEYS = ['pos', 'pkc', 'logo', 'lu', 'pn', 'bn', 'bpn', 'bh', 'bbh', 'ph', 'pcol', 'pnum', 'mgr', 'lsty', 'tcol', 'ppn', 'rph', 'cat', 'prep', 'pform', 'cer', 'sng'];
 const clone = x => JSON.parse(JSON.stringify(x));
 function slotToTeam(i) { const o = { name: teamName(i), skin: Settings.skins[i] | 0 }; for (const k of TEAM_KEYS) o[k] = clone(Settings[k + i]); return o; }
 function teamToSlot(tm, i) { Settings['team' + i] = tm.name; for (const k of TEAM_KEYS) if (tm[k] !== undefined) Settings[k + i] = clone(tm[k]); if (tm.skin !== undefined) Settings.skins[i] = tm.skin;
   const pp = Settings['ppn' + i] = Array.isArray(Settings['ppn' + i]) ? Settings['ppn' + i] : []; while (pp.length < 5) pp.push(''); pp.length = 5;
+  Settings['pnum' + i] = pnumFix(Settings['pnum' + i]); if (!posOk(tm.pos)) Settings['pos' + i] = posDefault(Settings['cat' + i]); Settings['cat' + i] = Settings['pos' + i].indexOf(0);
   const rh = Settings['rph' + i] = Array.isArray(Settings['rph' + i]) ? Settings['rph' + i] : []; while (rh.length < 4) rh.push(DEF_RPH[rh.length]); rh.length = 4;
   if (!Array.isArray(Settings['prep' + i]) || Settings['prep' + i].length !== 5) Settings['prep' + i] = DEF_PREP.slice(); if (!Array.isArray(Settings['pform' + i]) || Settings['pform' + i].length !== 5) Settings['pform' + i] = DEF_PFORM.slice();
   if (!Array.isArray(Settings['cer' + i]) || Settings['cer' + i].length !== 12) Settings['cer' + i] = Array.from({ length: 12 }, (_, k) => k % 6); if (!Array.isArray(Settings['sng' + i]) || Settings['sng' + i].length !== 12) Settings['sng' + i] = Array.from({ length: 12 }, (_, k) => k < 9 ? 1 + k % 6 : 0); }
@@ -3409,7 +3452,8 @@ function updTypeCaps(t) {
   const n = typeCount(t), el = document.querySelector(`.tpanel[data-t="${t}"]`); if (!el) return;
   el.querySelectorAll('select[data-k="lu"],select[data-k="bn"]').forEach(sel => { [...sel.options].forEach(o => { const k = +o.value; o.disabled = k > 0 && n[k] >= TYPE_CAP[k] && +sel.value !== k; }); });
   const ct = el.querySelector('.cattip'), ci = Settings['cat' + t] | 0, cty = Settings['lu' + t][ci] | 0;
-  if (ct) ct.innerHTML = `${BTYPES[cty].icon}${BTYPES[cty].name} 포수: ${CATCH[cty].tip} · 포수도 ${ci + 1}번 타자로 쳐요`;
+  if (ct) ct.innerHTML = `🧤 포수 ${ci + 1}번 ${esc(Settings['pn' + t][ci] || '선수' + (ci + 1))} (${BTYPES[cty].icon}${BTYPES[cty].name}): ${CATCH[cty].tip}`;
+  el.querySelectorAll('.posl').forEach(sp => { const i = +sp.dataset.i; sp.textContent = `${i + 1}번 ${Settings['pn' + t][i] || '선수' + (i + 1)} ${BTYPES[Settings['lu' + t][i] | 0].icon}`; });
   const cs = el.querySelector('select[data-k="cat"]'); if (cs) [...cs.options].forEach((o, i) => { const ty = Settings['lu' + t][i] | 0; o.textContent = `${i + 1}번 ${Settings['pn' + t][i] || '선수' + (i + 1)} ${BTYPES[ty].icon}${BTYPES[ty].name}`; });
   const cl = el.querySelector('.capline'); if (cl) cl.innerHTML = [1, 2, 3, 4].map(k => `<span style="${n[k] >= TYPE_CAP[k] ? 'color:#e03131;font-weight:bold' : ''}">${BTYPES[k].icon}${BTYPES[k].name} ${n[k]}/${TYPE_CAP[k]}</span>`).join(' · ');
 }
@@ -3641,9 +3685,9 @@ async function createRoom() {
       if (!(await r.get()).exists()) ref = r;
     }
     if (!ref) { toast('방을 만들지 못했어요. 다시 시도해 주세요'); return; }
-    await ref.set({ host: { name, skin: Settings.mySkin, logo: Settings.logo0 | 0, lu: luEncode(Settings.lu0), pn: Settings.pn0.join('|').slice(0, 70), bn: luEncode(Settings.bn0), bpn: Settings.bpn0.join('|').slice(0, 30), bh: handEncode(Settings.bh0), bbh: handEncode(Settings.bbh0), ph: Settings.ph0 | 0, pcol: Settings.pcol0.join(','), pnum: Settings.pnum0.join(','), mgr: String(Settings.mgr0 || '').slice(0, 8), lsty: Settings.lsty0 | 0, tcol: Settings.tcol0 | 0, rph: rphBits(Settings.rph0), ppn: Settings.ppn0.join('|').slice(0, 40), cat: Settings.cat0 | 0, prep: prepEncode(Settings.prep0), pform: handEncode(Settings.pform0), cer: Settings.cer0.join(''), sng: Settings.sng0.join(''), pkc: pkcOf(0) }, status: 'waiting', created: firebase.database.ServerValue.TIMESTAMP });
+    await ref.set({ host: { name, skin: Settings.mySkin, logo: Settings.logo0 | 0, lu: luEncode(Settings.lu0), pn: Settings.pn0.join('|').slice(0, 70), bn: luEncode(Settings.bn0), bpn: Settings.bpn0.join('|').slice(0, 30), bh: handEncode(Settings.bh0), bbh: handEncode(Settings.bbh0), ph: Settings.ph0 | 0, pcol: Settings.pcol0.join(','), pnum: Settings.pnum0.join(','), mgr: String(Settings.mgr0 || '').slice(0, 8), lsty: Settings.lsty0 | 0, tcol: Settings.tcol0 | 0, rph: rphBits(Settings.rph0), ppn: Settings.ppn0.join('|').slice(0, 40), cat: posEnc(Settings.pos0), prep: prepEncode(Settings.prep0), pform: handEncode(Settings.pform0), cer: Settings.cer0.join(''), sng: Settings.sng0.join(''), pkc: pkcOf(0) }, status: 'waiting', created: firebase.database.ServerValue.TIMESTAMP });
     ref.onDisconnect().remove();
-    Object.assign(Net, { role: 'host', code, room: ref, names: [name, ''], skins: [Settings.mySkin, 1], logos: [Settings.logo0 | 0, 3], lus: [luEncode(Settings.lu0), 0], pns: [Settings.pn0.join('|'), ''], bns: [luEncode(Settings.bn0), 0], bpns: [Settings.bpn0.join('|'), ''], bhs: [handEncode(Settings.bh0), 0], bbhs: [handEncode(Settings.bbh0), 0], phs: [Settings.ph0 | 0, 0], pcols: [Settings.pcol0.join(','), ''], pnums: [Settings.pnum0.join(','), ''], mgrs: [String(Settings.mgr0 || ''), ''], lstys: [Settings.lsty0 | 0, 0], pkcs: [pkcOf(0), '마!'], tcols: [Settings.tcol0 | 0, 1], rphs: [rphBits(Settings.rph0), 9], ppns: [Settings.ppn0.join('|'), ''], cats: [Settings.cat0 | 0, 7], preps: [prepEncode(Settings.prep0), 0], pforms: [handEncode(Settings.pform0), 0], cers: [Settings.cer0.join(''), ''], sngs: [Settings.sng0.join(''), ''], status: 'waiting', match: null });
+    Object.assign(Net, { role: 'host', code, room: ref, names: [name, ''], skins: [Settings.mySkin, 1], logos: [Settings.logo0 | 0, 3], lus: [luEncode(Settings.lu0), 0], pns: [Settings.pn0.join('|'), ''], bns: [luEncode(Settings.bn0), 0], bpns: [Settings.bpn0.join('|'), ''], bhs: [handEncode(Settings.bh0), 0], bbhs: [handEncode(Settings.bbh0), 0], phs: [Settings.ph0 | 0, 0], pcols: [Settings.pcol0.join(','), ''], pnums: [Settings.pnum0.join(','), ''], mgrs: [String(Settings.mgr0 || ''), ''], lstys: [Settings.lsty0 | 0, 0], pkcs: [pkcOf(0), '마!'], tcols: [Settings.tcol0 | 0, 1], rphs: [rphBits(Settings.rph0), 9], ppns: [Settings.ppn0.join('|'), ''], cats: [posEnc(Settings.pos0), 7], preps: [prepEncode(Settings.prep0), 0], pforms: [handEncode(Settings.pform0), 0], cers: [Settings.cer0.join(''), ''], sngs: [Settings.sng0.join(''), ''], status: 'waiting', match: null });
     series = [0, 0];
     netListen(ref.child('guest'), 'value', s => {
       const g = s.val(), had = !!Net.names[1];
@@ -3675,7 +3719,7 @@ function specNewMatch(m) {
 }
 function specInput(p, m) {
   if (!m || m.m !== Spec.mid || typeof m.d !== 'string') return;
-  for (let i = 0; i < m.d.length; i++) { const c = m.d.charCodeAt(i) - 65; if (c >= 0 && c < 41 && m.s + i >= Spec.frame) Spec.inp[p][m.s + i] = c; }
+  for (let i = 0; i < m.d.length; i++) { const c = m.d.charCodeAt(i) - 65; if (c >= 0 && c < 58 && m.s + i >= Spec.frame) Spec.inp[p][m.s + i] = c; }
 }
 function specSync(m) {
   if (!m || m.m !== Spec.mid || typeof m.s !== 'string' || !Spec.G) return;
@@ -3790,11 +3834,11 @@ async function joinRoom() {
     const hostSkin = snap.val().host.skin | 0;
     if (mySkin === hostSkin) { mySkin = (hostSkin + 1) % SKINS.length; toast(`방장과 색이 같아서 ${SKINS[mySkin].name} 색으로 바꿨어요`); }
     const hv = snap.val().host;
-    const r = await ref.child('guest').transaction(cur => cur ? undefined : { name, skin: mySkin, logo: Settings.logo0 | 0, lu: luEncode(Settings.lu0), pn: Settings.pn0.join('|').slice(0, 70), bn: luEncode(Settings.bn0), bpn: Settings.bpn0.join('|').slice(0, 30), bh: handEncode(Settings.bh0), bbh: handEncode(Settings.bbh0), ph: Settings.ph0 | 0, pcol: Settings.pcol0.join(','), pnum: Settings.pnum0.join(','), mgr: String(Settings.mgr0 || '').slice(0, 8), lsty: Settings.lsty0 | 0, tcol: Settings.tcol0 | 0, rph: rphBits(Settings.rph0), ppn: Settings.ppn0.join('|').slice(0, 40), cat: Settings.cat0 | 0, prep: prepEncode(Settings.prep0), pform: handEncode(Settings.pform0), cer: Settings.cer0.join(''), sng: Settings.sng0.join(''), pkc: pkcOf(0) });
+    const r = await ref.child('guest').transaction(cur => cur ? undefined : { name, skin: mySkin, logo: Settings.logo0 | 0, lu: luEncode(Settings.lu0), pn: Settings.pn0.join('|').slice(0, 70), bn: luEncode(Settings.bn0), bpn: Settings.bpn0.join('|').slice(0, 30), bh: handEncode(Settings.bh0), bbh: handEncode(Settings.bbh0), ph: Settings.ph0 | 0, pcol: Settings.pcol0.join(','), pnum: Settings.pnum0.join(','), mgr: String(Settings.mgr0 || '').slice(0, 8), lsty: Settings.lsty0 | 0, tcol: Settings.tcol0 | 0, rph: rphBits(Settings.rph0), ppn: Settings.ppn0.join('|').slice(0, 40), cat: posEnc(Settings.pos0), prep: prepEncode(Settings.prep0), pform: handEncode(Settings.pform0), cer: Settings.cer0.join(''), sng: Settings.sng0.join(''), pkc: pkcOf(0) });
     if (!r.committed) { toast('방이 꽉 찼어요'); return; }
     ref.child('guest').onDisconnect().remove();
     ref.child('i1').onDisconnect().remove();
-    Object.assign(Net, { role: 'guest', code, room: ref, names: [hv.name, name], skins: [hostSkin, mySkin], logos: [hv.logo | 0, Settings.logo0 | 0], lus: [hv.lu | 0, luEncode(Settings.lu0)], pns: [String(hv.pn || ''), Settings.pn0.join('|')], bns: [hv.bn | 0, luEncode(Settings.bn0)], bpns: [String(hv.bpn || ''), Settings.bpn0.join('|')], bhs: [hv.bh | 0, handEncode(Settings.bh0)], bbhs: [hv.bbh | 0, handEncode(Settings.bbh0)], phs: [hv.ph | 0, Settings.ph0 | 0], pcols: [String(hv.pcol || ''), Settings.pcol0.join(',')], pnums: [String(hv.pnum || ''), Settings.pnum0.join(',')], mgrs: [String(hv.mgr || ''), String(Settings.mgr0 || '')], lstys: [hv.lsty | 0, Settings.lsty0 | 0], pkcs: [typeof hv.pkc === 'string' ? hv.pkc.slice(0, 12) : '마!', pkcOf(0)], tcols: [hv.tcol | 0, Settings.tcol0 | 0], rphs: [hv.rph == null ? 9 : hv.rph | 0, rphBits(Settings.rph0)], ppns: [String(hv.ppn || ''), Settings.ppn0.join('|')], cats: [hv.cat == null ? 7 : hv.cat | 0, Settings.cat0 | 0], preps: [+hv.prep || 0, prepEncode(Settings.prep0)], pforms: [hv.pform | 0, handEncode(Settings.pform0)], cers: [String(hv.cer || ''), Settings.cer0.join('')], sngs: [String(hv.sng || ''), Settings.sng0.join('')], status: null, match: null });
+    Object.assign(Net, { role: 'guest', code, room: ref, names: [hv.name, name], skins: [hostSkin, mySkin], logos: [hv.logo | 0, Settings.logo0 | 0], lus: [hv.lu | 0, luEncode(Settings.lu0)], pns: [String(hv.pn || ''), Settings.pn0.join('|')], bns: [hv.bn | 0, luEncode(Settings.bn0)], bpns: [String(hv.bpn || ''), Settings.bpn0.join('|')], bhs: [hv.bh | 0, handEncode(Settings.bh0)], bbhs: [hv.bbh | 0, handEncode(Settings.bbh0)], phs: [hv.ph | 0, Settings.ph0 | 0], pcols: [String(hv.pcol || ''), Settings.pcol0.join(',')], pnums: [String(hv.pnum || ''), Settings.pnum0.join(',')], mgrs: [String(hv.mgr || ''), String(Settings.mgr0 || '')], lstys: [hv.lsty | 0, Settings.lsty0 | 0], pkcs: [typeof hv.pkc === 'string' ? hv.pkc.slice(0, 12) : '마!', pkcOf(0)], tcols: [hv.tcol | 0, Settings.tcol0 | 0], rphs: [hv.rph == null ? 9 : hv.rph | 0, rphBits(Settings.rph0)], ppns: [String(hv.ppn || ''), Settings.ppn0.join('|')], cats: [hv.cat == null ? 7 : hv.cat | 0, posEnc(Settings.pos0)], preps: [+hv.prep || 0, prepEncode(Settings.prep0)], pforms: [hv.pform | 0, handEncode(Settings.pform0)], cers: [String(hv.cer || ''), Settings.cer0.join('')], sngs: [String(hv.sng || ''), Settings.sng0.join('')], status: null, match: null });
     series = [0, 0];
     const maybeStart = () => {
       if (Net.status === 'playing' && Net.match && (!RB || RB.mid !== Net.match.id)) startOnline(Net.match);
