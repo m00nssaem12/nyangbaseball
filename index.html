@@ -4125,6 +4125,7 @@ function whoRender() {
     h += `<div class="row"><button class="ck-sbtn ${WHO_EDIT ? 'blue' : 'gray'}" onclick="whoEditToggle()">${WHO_EDIT ? '✔ 고치기 끝' : '✏️ 명단에서 빼기'}</button></div>`;
   } else WHO_EDIT = 0;
   h += ckTeacherHTML() + ckSyncHTML() + ckStuHTML();
+  if (!P.list.length && ckSynced() && !edit) h += `<div class="tips">아직 반 명단이 없어요 · 선생님 기기에 학생 명단이 있는지 확인해요</div><div class="row"><button class="ck-sbtn blue" onclick="ckStuRefresh()">🔄 명단 다시 불러오기</button></div>`;
   if (stu || ckStuDev()) h += `<div class="row" style="margin-top:8px"><button class="ck-sbtn gray" onclick="ckAuth(() => whoRender())">🔒 선생님</button></div>`;
   h += `<div style="font-size:11.5px;color:#868e96;margin-top:6px">${ckSynced() ? '반 코드로 묶인 모든 기기 · 모든 냥냥 게임이 같은 명단을 써요' : '학생 명단은 이 기기의 다른 냥냥 게임에서도 그대로 쓸 수 있어요'} (최대 40명)</div>`;
   $('#who-body').innerHTML = h;
@@ -4945,6 +4946,15 @@ function ckStuConnect(then) {
     ckStuJoin(code, then);
   }, '선생님이 알려 준 반 코드를 넣어요', { text: 1, icon: '🙋', ph: '반 코드', extra: { label: '🔒 선생님이에요', fn: () => ckAuth(then) } });
 }
+async function ckStuRefresh() {
+  const d = ckDb(); if (!d) { toast('온라인 연결(Firebase)이 안 돼요'); return; }
+  try {
+    const v = (await d.ref(`${ckCls()}/roster`).once('value')).val();
+    if (!v || !v.j) { toast('반 명단이 아직 올라오지 않았어요 · 선생님 기기에서 이 파일을 열어요'); return; }
+    await ckRosterApply(v, 0);
+    toast(plLoad().list.length ? '🔄 명단을 불러왔어요' : '명단을 풀지 못했어요 · 반 코드를 다시 연결해요'); ckReDraw();
+  } catch (e) { toast('불러오지 못했어요 (인터넷 확인)'); }
+}
 function ckStuJoin(code, then) {
   const d = ckDb(); if (!d) { toast('온라인 연결(Firebase)이 안 돼요'); return; }
   d.ref(`nyangClass/${ckKey(code)}/teach`).once('value').then(async sn => {
@@ -4953,7 +4963,7 @@ function ckStuJoin(code, then) {
     let S; try { S = await ckAesDec(await ckPinKey(code, CK_STU_PIN, CK_STU_SALT), T.sw); } catch (e) { toast('연결하지 못했어요 · 반 코드를 확인해요'); return; }
     CKLS.set('nyangClassCode', code); CKLS.set('nyangClassKey', ckB64(S)); CKLS.set('nyangClassSync', code); CKLS.set('nyangRole', 'student'); CK_KEY = null; CK_OPEN = 0;
     const L = ckT(); L.h = T.h; CKLS.set('nyangTeacher', L);               // 선생님 비밀번호는 몰라도 '잠금'은 같이 걸려요
-    await ckRosterPull(0); ckSyncStart(); toast(`🙋 '${code}' 반에 연결됐어요 · 내 이름을 골라요`); ckReDraw(); if (then) then();
+    await ckRosterPull(0); ckSyncStart(); toast(plLoad().list.length ? `🙋 '${code}' 반에 연결됐어요 · 내 이름을 골라요` : `🙋 '${code}' 반에 연결됐지만 명단이 비어 있어요`); ckReDraw(); if (then) then();
   }, () => toast('연결하지 못했어요 (인터넷과 Firebase 규칙을 확인해요)'));
 }
 
@@ -5027,6 +5037,7 @@ function ckSyncStart() {
   r3.on('value', sn => { CK_CTL = sn.val(); ckPauseDraw(); });
   const r4 = d.ref(`${ckCls()}/msg`); CK_REFS.push(r4); r4.on('value', sn => ckMsgShow(sn.val()));
   if (typeof recLoad === 'function') setTimeout(() => { for (const p of plLoad().list) if (recLoad(p.id).games.length) ckRecUpload(p.id); }, 1500);   // 이 기기에 있던 기록도 반으로
+  if (!ckStuDev()) r1.once('value', sn => { if (!sn.val() && plLoad().list.length) ckRosterPush(1); });   // 반에 명단이 없으면 이 기기 명단을 올려요
   r1.on('value', sn => ckRosterApply(sn.val(), 0));
   r2.on('value', sn => { const T = sn.val(); if (T && T.w && !T.sw) ckStuBackfill(); if (T && T.h && T.h !== ckT().h) { const L = ckT(); L.h = T.h; CKLS.set('nyangTeacher', L); CK_OPEN = 0; ckReDraw(); } });
 }
