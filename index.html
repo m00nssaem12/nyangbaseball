@@ -4109,7 +4109,7 @@ function applyPlayerNames() {
   if (a && (mode === 'cpu' || mode === 'local')) Names[0] = a.name;
   if (b && mode === 'local') Names[1] = b.name;
 }
-function updWhoBtn() { const b = $('#btn-who'); if (!b) return; const a = slotPlayer(0); b.innerHTML = (a ? `👤 ${esc(a.name)}` : '👤 학생 선택') + (ckOpen() ? '' : ' 🔒'); }
+function updWhoBtn() { const b = $('#btn-who'); if (!b) return; const a = slotPlayer(0); b.innerHTML = (a ? `👤 ${esc(a.name)}` : '👤 학생 선택') + (ckOpen() || ckStuDev() ? '' : ' 🔒'); }
 let WHO_SLOT = 0, WHO_EDIT = 0;
 function showWho() { whoRender(); showScreen('who'); }
 function whoRender() {
@@ -4125,7 +4125,7 @@ function whoRender() {
     h += `<div class="row"><button class="ck-sbtn ${WHO_EDIT ? 'blue' : 'gray'}" onclick="whoEditToggle()">${WHO_EDIT ? '✔ 고치기 끝' : '✏️ 명단에서 빼기'}</button></div>`;
   } else WHO_EDIT = 0;
   h += ckTeacherHTML() + ckSyncHTML() + ckStuHTML();
-  if (stu) h += `<div class="row" style="margin-top:8px"><button class="ck-sbtn gray" onclick="ckAuth(() => whoRender())">🔒 선생님</button></div>`;
+  if (stu || ckStuDev()) h += `<div class="row" style="margin-top:8px"><button class="ck-sbtn gray" onclick="ckAuth(() => whoRender())">🔒 선생님</button></div>`;
   h += `<div style="font-size:11.5px;color:#868e96;margin-top:6px">${ckSynced() ? '반 코드로 묶인 모든 기기 · 모든 냥냥 게임이 같은 명단을 써요' : '학생 명단은 이 기기의 다른 냥냥 게임에서도 그대로 쓸 수 있어요'} (최대 40명)</div>`;
   $('#who-body').innerHTML = h;
 }
@@ -4891,11 +4891,15 @@ function ckTeacherHTML() {
 (function () {
   const guard = (n, test) => { const f = window[n]; if (typeof f !== 'function') return; window[n] = function (...a) { if (test && !test(...a)) return f.apply(this, a); ckAuth(() => f.apply(this, a)); }; };
   guard('whoAdd', nm => nm === undefined);                               // 입력 칸에서 넣을 때만 (한꺼번에 넣기는 아래에서)
-  guard('showWho', () => !ckStuOn());                                    // 학생 그림 비밀번호가 켜져 있으면 학생도 열 수 있어요
+  guard('showWho', () => !(ckStuOn() || ckStuDev()));                                    // 학생 그림 비밀번호가 켜져 있으면 학생도 열 수 있어요
   { const f = window.whoPick; if (typeof f === 'function') window.whoPick = function (id) {
       if (ckOpen()) return f(id);
       if (ckStuOn()) { if (!id) return f(id); return ckPicCheck(id, () => f(id)); }   // 학생: 자기 그림 비밀번호
+      if (ckStuDev()) return f(id);                                                  // 반 코드로 연결한 학생 기기
       ckAuth(() => f(id)); }; }
+  { const g = window.showWho; if (typeof g === 'function') window.showWho = function (...a) {   // 연결 안 된 기기: 먼저 반 코드만 물어요 (선생님은 버튼으로)
+      if (!ckOpen() && !ckSynced() && !ckStuOn()) return ckStuConnect(() => g.apply(this, a));
+      return g.apply(this, a); }; }
   ['whoAddMany', 'whoDel', 'whoEditToggle', 'recClear', 'lgMake', 'lgSet', 'lgReset', 'ckSetCode',
    'sdEditOpen', 'sdReset', 'sdBonus', 'sdSkip', 'sdUndo', 'sdDone', 'sdNetOn', 'sdNetOff', 'sdAddNames', 'hubAdd', 'hubDel'].forEach(n => guard(n));
 })();
@@ -4923,6 +4927,36 @@ const ckDecS = async s => CK_DEC.decode(await ckAesDec(await ckClassKey(), s));
 const ckCls = () => `nyangClass/${ckKey(classCode())}`;
 const ckDev = () => { let d = CKLS.get('nyangDevice', ''); if (!d) { d = 'd' + Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36); CKLS.set('nyangDevice', d); } return d; };
 
+
+/* ----- 🙋 학생 기기: 반 코드만으로 연결 (선생님 비밀번호 없이 · 선생님 기능은 계속 잠겨 있어요) ----- */
+const CK_STU_SALT = CK_ENC.encode('nyang-stu-v1'), CK_STU_PIN = '#student#';
+const ckStuDev = () => CKLS.get('nyangRole', '') === 'student' && ckSynced();
+async function ckStuWrap(code, S) { return ckAesEnc(await ckPinKey(code, CK_STU_PIN, CK_STU_SALT), S); }
+let CK_SBF = 0;
+async function ckStuBackfill() {                                         // 예전에 만든 반에 학생 연결용 보관본 채우기
+  if (CK_SBF || !ckSynced()) return; CK_SBF = 1;
+  try { const d = ckDb(); if (d) await d.ref(`${ckCls()}/teach/sw`).set(await ckStuWrap(classCode(), ckUnB64(CKLS.get('nyangClassKey', '')))); } catch (e) {}
+  CK_SBF = 0;
+}
+function ckStuConnect(then) {
+  ckPinBox('반 코드 넣기', code => {
+    if (code === null) return; code = String(code).trim().slice(0, 20);
+    if (code.length < 2) { toast('반 코드를 2글자 이상 넣어요'); return; }
+    ckStuJoin(code, then);
+  }, '선생님이 알려 준 반 코드를 넣어요', { text: 1, icon: '🙋', ph: '반 코드', extra: { label: '🔒 선생님이에요', fn: () => ckAuth(then) } });
+}
+function ckStuJoin(code, then) {
+  const d = ckDb(); if (!d) { toast('온라인 연결(Firebase)이 안 돼요'); return; }
+  d.ref(`nyangClass/${ckKey(code)}/teach`).once('value').then(async sn => {
+    const T = sn.val(); if (!T || !T.w) { toast('그런 반 코드가 없어요 · 반 코드를 다시 확인해요'); return; }
+    if (!T.sw) { toast('아직 학생 연결이 준비되지 않았어요 · 선생님이 이 게임을 한 번 열면 돼요'); return; }
+    let S; try { S = await ckAesDec(await ckPinKey(code, CK_STU_PIN, CK_STU_SALT), T.sw); } catch (e) { toast('연결하지 못했어요 · 반 코드를 확인해요'); return; }
+    CKLS.set('nyangClassCode', code); CKLS.set('nyangClassKey', ckB64(S)); CKLS.set('nyangClassSync', code); CKLS.set('nyangRole', 'student'); CK_KEY = null; CK_OPEN = 0;
+    const L = ckT(); L.h = T.h; CKLS.set('nyangTeacher', L);               // 선생님 비밀번호는 몰라도 '잠금'은 같이 걸려요
+    await ckRosterPull(0); ckSyncStart(); toast(`🙋 '${code}' 반에 연결됐어요 · 내 이름을 골라요`); ckReDraw(); if (then) then();
+  }, () => toast('연결하지 못했어요 (인터넷과 Firebase 규칙을 확인해요)'));
+}
+
 /* ----- 새 반 만들기 · 연결하기 · 끊기 ----- */
 function ckAskCode(title, cb) { ckPinBox(title, v => { if (v === null) return; const c = String(v).trim().slice(0, 20); if (c.length < 2) { toast('반 코드를 2글자 이상 넣어요'); return; } cb(c); }, '다른 반과 겹치지 않게 학교 이름까지 (예: 해솔초3-2)', { text: 1, icon: '🌐', ph: '반 코드' }); }
 function ckSyncNew() {
@@ -4935,8 +4969,8 @@ function ckSyncNew() {
         try {
           const S = crypto.getRandomValues(new Uint8Array(32)), salt = crypto.getRandomValues(new Uint8Array(16));
           const w = await ckAesEnc(await ckPinKey(code, pin, salt), S);
-          await d.ref(`nyangClass/${ckKey(code)}/teach`).set({ h: ckT().h, s: ckB64(salt), w, t: Date.now() });
-          CKLS.set('nyangClassCode', code); CKLS.set('nyangClassKey', ckB64(S)); CKLS.set('nyangClassSync', code);
+          await d.ref(`nyangClass/${ckKey(code)}/teach`).set({ h: ckT().h, s: ckB64(salt), w, sw: await ckStuWrap(code, S), t: Date.now() });
+          CKLS.set('nyangClassCode', code); CKLS.set('nyangClassKey', ckB64(S)); CKLS.set('nyangClassSync', code); CKLS.set('nyangRole', '');
           await ckRosterPush(1); ckSyncStart(); try { ckUploadAll(1); } catch (e) {}
           toast(`🌐 반 코드 '${code}'를 만들었어요 · 다른 기기는 "만든 반에 연결"로 들어와요`); ckReDraw();
         } catch (e) { toast('만들지 못했어요 (Firebase 규칙을 새로 붙여 넣어 주세요)'); }
@@ -4953,19 +4987,19 @@ function ckJoin(then, preset) {                                          // 다�
       ckPinBox(`'${code}' 선생님 비밀번호`, async pin => {
         if (pin === null) return;
         let S; try { S = await ckAesDec(await ckPinKey(code, pin, ckUnB64(T.s)), T.w); } catch (e) { toast('비밀번호가 달라요'); return; }
-        CKLS.set('nyangClassCode', code); CKLS.set('nyangClassKey', ckB64(S)); CKLS.set('nyangClassSync', code); CK_KEY = null;
+        CKLS.set('nyangClassCode', code); CKLS.set('nyangClassKey', ckB64(S)); CKLS.set('nyangClassSync', code); CKLS.set('nyangRole', ''); CK_KEY = null;
         const L = ckT(); L.h = T.h; CKLS.set('nyangTeacher', L); CK_OPEN = Date.now() + 10 * 60 * 1000;
         await ckRosterPull(1); ckSyncStart(); toast(`🌐 '${code}' 반에 연결했어요 · 명단과 비밀번호를 받아 왔어요`); ckReDraw(); if (then) then();
       }, '다른 기기에서 정한 선생님 비밀번호예요');
     }, () => toast('연결하지 못했어요 (Firebase 규칙을 확인해 주세요)'));
   });
 }
-function ckSyncOff() { ckAuth(() => { if (!confirm('이 기기를 반 코드에서 끊을까요? (명단과 기록은 이 기기에 남아요)')) return; CKLS.set('nyangClassSync', ''); CKLS.set('nyangClassKey', ''); CK_KEY = null; ckSyncStop(); ckReDraw(); toast('연결을 끊었어요'); }); }
+function ckSyncOff() { ckAuth(() => { if (!confirm('이 기기를 반 코드에서 끊을까요? (명단과 기록은 이 기기에 남아요)')) return; CKLS.set('nyangClassSync', ''); CKLS.set('nyangClassKey', ''); CKLS.set('nyangRole', ''); CK_KEY = null; ckSyncStop(); ckReDraw(); toast('연결을 끊었어요'); }); }
 async function ckSyncRewrap(pin) {                                       // 선생님 비밀번호를 바꾸면 모든 기기에 같이 바뀌어요
   if (!ckSynced()) return; const d = ckDb(); if (!d) return;
   try {
     const S = ckUnB64(CKLS.get('nyangClassKey', '')), salt = crypto.getRandomValues(new Uint8Array(16)), code = classCode();
-    await d.ref(`${ckCls()}/teach`).set({ h: ckHash(pin), s: ckB64(salt), w: await ckAesEnc(await ckPinKey(code, pin, salt), S), t: Date.now(), o: CK_OLDH || '' });
+    await d.ref(`${ckCls()}/teach`).set({ h: ckHash(pin), s: ckB64(salt), w: await ckAesEnc(await ckPinKey(code, pin, salt), S), sw: await ckStuWrap(code, S), t: Date.now(), o: CK_OLDH || '' });
   } catch (e) { toast('다른 기기에 새 비밀번호를 알리지 못했어요'); }
 }
 let CK_OLDH = '';
@@ -4994,11 +5028,11 @@ function ckSyncStart() {
   const r4 = d.ref(`${ckCls()}/msg`); CK_REFS.push(r4); r4.on('value', sn => ckMsgShow(sn.val()));
   if (typeof recLoad === 'function') setTimeout(() => { for (const p of plLoad().list) if (recLoad(p.id).games.length) ckRecUpload(p.id); }, 1500);   // 이 기기에 있던 기록도 반으로
   r1.on('value', sn => ckRosterApply(sn.val(), 0));
-  r2.on('value', sn => { const T = sn.val(); if (T && T.h && T.h !== ckT().h) { const L = ckT(); L.h = T.h; CKLS.set('nyangTeacher', L); CK_OPEN = 0; ckReDraw(); } });
+  r2.on('value', sn => { const T = sn.val(); if (T && T.w && !T.sw) ckStuBackfill(); if (T && T.h && T.h !== ckT().h) { const L = ckT(); L.h = T.h; CKLS.set('nyangTeacher', L); CK_OPEN = 0; ckReDraw(); } });
 }
 (function () {                                                           // 명단을 고치면 반 명단에도 올려요
   if (typeof plSave !== 'function') return; const f = plSave;
-  window.plSave = function (P) { try { if (P.stu) ckStuEnsure(P); } catch (e) {} f(P); ckRosterPush(); };
+  window.plSave = function (P) { try { if (P.stu) ckStuEnsure(P); } catch (e) {} f(P); if (!ckStuDev()) ckRosterPush(); };
 })();
 
 /* ----- 기록 맞추기 (학생 한 명 · 이 게임) ----- */
@@ -5066,7 +5100,7 @@ function ckPauseHTML() {
 }
 
 /* ----- 💾 백업 · 복원 (명단 · 선생님 비밀번호 · 모든 냥냥 게임 기록) ----- */
-const CK_NOBAK = ['nyangDevice', 'nyangClassKey', 'nyangClassSync', 'nyangGameUrls'];
+const CK_NOBAK = ['nyangRole', 'nyangDevice', 'nyangClassKey', 'nyangClassSync', 'nyangGameUrls'];
 function ckBackup() {
   ckAuth(() => {
     const o = { app: 'nyang', v: 1, t: Date.now(), data: {} };
@@ -5130,7 +5164,7 @@ function ckJoinParam() {                                                 // QR�
   const code = decodeURIComponent(m[1]).slice(0, 20);
   try { history.replaceState(null, '', location.pathname + location.search.replace(/([?&])join=[^&#]+&?/, '$1').replace(/[?&]$/, '') + location.hash); } catch (e) {}
   if (ckSynced() && classCode() === code) { toast(`🌐 이미 '${code}' 반에 연결돼 있어요`); return; }
-  setTimeout(() => ckJoin(() => { try { if (typeof SD_HUB === 'undefined') showWho(); } catch (e) {} }, code), 300);
+  setTimeout(() => { if (typeof SD_HUB === 'undefined') ckStuJoin(code, () => { try { showWho(); } catch (e) {} }); else ckJoin(null, code); }, 300);
 }
 
 /* ----- 🖼 학생 그림 비밀번호 (학생이 자기 이름만 고를 수 있게) ----- */
