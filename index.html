@@ -5510,7 +5510,7 @@ const Music = {
   }
 };
 function updMusic() { const b = $('#btn-music'); if (b) b.textContent = Settings.music !== false ? '🎵 음악' : '🎵 음악 꺼짐'; }
-function updSound() { $('#btn-sound').textContent = Settings.sound ? '🔊 소리' : '🔇 소리 꺼짐'; }
+function updSound() { $('#btn-sound').textContent = Setings.sound ? '🔊 소리' : '🔇 소리 꺼짐'; }
 
 buildParkSel(); updSegs(); updSound(); updMusic(); updBoard(); buildSwatches(); initTeamInputs(); layout(); startDemo();
 requestAnimationFrame(frame);
