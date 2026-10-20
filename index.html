@@ -4936,8 +4936,7 @@ async function ckStuWrap(code, S) { return ckAesEnc(await ckPinKey(code, CK_STU_
 let CK_SBF = 0;
 async function ckStuBackfill() {                                         // 예전에 만든 반에 학생 연결용 보관본 채우기
   if (CK_SBF || !ckSynced()) return; CK_SBF = 1;
-  try { const d = ckDb(); if (d) await d.ref(`${ckCls()}/teach/sw`).set(await ckStuWrap(classCode(), ckUnB64(CKLS.get('nyangClassKey', '')))); } catch (e) {}
-  CK_SBF = 0;
+  try { const d = ckDb(); if (d) await d.ref(`${ckCls()}/teach/sw`).set(await ckStuWrap(classCode(), ckUnB64(CKLS.get('nyangClassKey', '')))); } catch (e) {}                                                       // 한 번만 시도해요 (거부돼도 되풀이하지 않아요)
 }
 function ckStuConnect(then) {
   ckPinBox('반 코드 넣기', code => {
