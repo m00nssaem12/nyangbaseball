@@ -5384,8 +5384,8 @@ const actions = {
   openChat, closeChat,
   quickChat: b => { sendChat(b.dataset.q); }
 };
-// 🔒 팀·타순(견제 응원 · 선발 로테이션 포함)과 리그 · 토너먼트 관리는 선생님 비밀번호가 있어야 해요 (경기 시작은 그대로)
-['team', 'lgadd', 'lgreset', 'lgsave', 'tourmake', 'tourdel', 'lgimport'].forEach(k => { const f = actions[k]; actions[k] = (...a) => typeof ckAuth === 'function' ? ckAuth(() => f(...a)) : f(...a); });
+// 🔒 리그 · 토너먼트 관리는 선생님 비밀번호가 있어야 해요 (팀·타순과 경기 시작은 그대로)
+['lgadd', 'lgreset', 'lgsave', 'tourmake', 'tourdel', 'lgimport'].forEach(k => { const f = actions[k]; actions[k] = (...a) => typeof ckAuth === 'function' ? ckAuth(() => f(...a)) : f(...a); });
 document.addEventListener('click', e => {
   const sw = e.target.closest('.sw button');
   if (sw) { pickSkin(sw.parentElement.dataset.side, +sw.dataset.skin); return; }
