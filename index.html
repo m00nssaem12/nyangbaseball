@@ -437,7 +437,7 @@ table.keys td,table.keys th{white-space:nowrap}
     &nbsp;&nbsp;&nbsp;&nbsp;타이밍이 빠르면 왼쪽, 늦으면 오른쪽으로 날아가요 · 원 아래쪽으로 맞히면 뜬공, 위쪽이면 땅볼<br>
     🖱 마우스도 돼요: 화면을 따라 원·조준점이 움직이고, 누르면 스윙·던지기 · 📱 <b>휴대폰</b>: 화면을 손가락으로 문지르면 원·조준점이 따라 움직이고, 톡 치면 스윙·던지기 (수비는 달려갈 곳을 눌러요)<br>
     🔄 <b>선수 교체</b>: 투수가 던지기 전에 화면 위 <b>🔄 교체</b> 버튼 → 대타(지금 타자) · 대주자(루에 있는 주자) · 대수비(수비 자리). 벤치 선수 3명은 팀·타순 메뉴에서 정해요 (🧤수비왕은 수비 범위가 넓어요)<br>
-    🤏 <b>작전</b>: 투구 전에 타자가 숫자 <kbd>1</kbd>~<kbd>7</kbd>이나 위쪽 작전 카드로 바로 골라요 (결정 버튼을 누르면 강공 → 번트 → 도루 … 차례로 바뀌어요) (번트는 원을 공에 대기만 하면 돼요, 도루는 주자가 있을 때)<br>
+    🤏 <b>작전</b>: 투구 전에 타자가 숫자 <kbd>1</kbd>~<kbd>7</kbd>이나 위쪽 작전 카드로 바로 골라요 (결정 버튼을 누르면 강공 → 번트 → 도루 … 차례로 바뀌어요) (번트는 원을 공에 대기만 하면 돼요 · 안 칠 공은 결정 버튼으로 방망이를 빼요, 방망이를 안 빼고 빗나가면 파울·스트라이크! · 도루는 주자가 있을 때)<br>
     🏃 깊은 뜬공이면 3루 주자가 홈으로(희생 플라이), 땅볼 때도 주자가 한 베이스씩 가요 · 1루에 주자가 있을 때 땅볼이면 <b>병살</b>, 운이 나쁘면 <b>삼중살</b>!<br>
     ⚾ <b>팀·로고·타순</b> 메뉴에서 팀 이름·로고와 9명 타순(🔥강타자 🎯교타자 💨준족)을 정할 수 있어요 · <b>타격 난이도</b>를 쉬움으로 하면 잘 맞아요<br>
     🫲 <b>좌우</b>: 타자는 우타·좌타·양타, 투수는 우투·좌투 (팀·타순 메뉴) · 같은 손끼리면 치기 조금 어렵고, 좌타는 당겨 치면 오른쪽으로 날아가요<br>
@@ -773,7 +773,7 @@ function newBatter(G) { G.balls = 0; G.strikes = 0; G.cu = 0; G.cv = 0; G.pko = 
 const pcFull = G => Math.round(G.rate * PCLOCK[G.bases.some(x => x) ? 1 : 0]);
 function nextPitch(G) {
   if (G.ptype >= NP || (G.prp && !pitchOpts(G).includes(G.ptype))) G.ptype = 0;
-  G.phase = 'select'; G.ball = null; G.swing = -1; G.swung = 0; G.tu = 0; G.tv = 0; G.lx = 0; G.ly = 0; G.res = null; G.bmode = (G.bmode === 1 && G.balls + G.strikes > 0) ? 1 : 0; G.selT = 0; G.pq = 0; G.ibbq = 0;
+  G.phase = 'select'; G.ball = null; G.swing = -1; G.swung = 0; G.tu = 0; G.tv = 0; G.lx = 0; G.ly = 0; G.res = null; G.bmode = (G.bmode === 1 && G.balls + G.strikes > 0) ? 1 : 0; G.pull = 0; G.selT = 0; G.pq = 0; G.ibbq = 0;
   G.pc = G.pclock ? pcFull(G) : 0; G.ct = -1;
 }
 // 주자 진루: n루타 (4 = 홈런), walk = 볼넷(밀어내기만)
@@ -975,6 +975,15 @@ function wildPitch(G) {
   for (let i = 2; i >= 0; i--) if (b[i]) { if (i === 2) { runs++; const sl = b[2] - 1; G.st[t][G.src[t][sl]][4]++; } else b[i + 1] = b[i]; b[i] = 0; }
   if (runs) { addRuns(G, runs); curP(G, pitTeam(G))[5] += runs; }
   return (rnd(G) < 0.5 ? '폭투!' : '포일!') + ' 주자 한 베이스씩' + (runs ? ' · 득점!' : '');
+}
+// 번트 시도인데 제대로 못 맞힘 (방망이를 빼지 않았으니 볼이 아니라 파울·스트라이크)
+function buntMiss(G, foul, pos) {
+  G.fx.px = pos.u; G.fx.py = pos.v; G.fx.bunt++;
+  if (G.strikes >= 2) { finishPA(G, { kind: 'k', out: 1, bases: 0, text: foul ? '스리번트 실패! 삼진' : '번트 헛스윙 삼진!' }); return; }
+  G.strikes++;
+  if (foul) { G.fx.foul++; G.res = { kind: 'foul', foulOnly: 1, text: '번트 파울', basesAfter: G.bases.slice() }; }
+  else { G.fx.strike++; G.res = { kind: 'strike', text: '번트 헛 · 스트라이크', basesAfter: G.bases.slice(), steal: '', drop: 0 }; }
+  G.phase = 'result'; G.timer = Math.round(G.rate * 1.3);
 }
 // 번트: 대부분 1루에서 아웃되지만 주자는 한 베이스씩 (희생 번트)
 function bunt(G, pos) {
@@ -1255,10 +1264,14 @@ function tick(G, inputs) {
       const bl = G.ball; bl.f++;
       if (pin.hit && G.ct < 0 && bl.f > 3) G.ct = bl.f;                // 포수: 공이 미트에 들어올 때 누르면 블로킹·빠른 송구
       if (G.bmode === 1) {                                           // 번트: 방망이를 대고 있다가 공이 오면 저절로 맞음
+        if (bin.hit && !G.swung && bl.f > 2) G.pull = 1;             // 결정 버튼 = 방망이 빼기 (안 칠 공)
         if (bl.f === bl.t && !G.swung) {
           G.swung = 1;
-          const pos = ballAt(bl, 1), d = Math.sqrt((pos.u - G.cu) ** 2 + (pos.v - G.cv) ** 2);
-          if (d < batR(G) * 1.35) { G.fx.px = pos.u; G.fx.py = pos.v; G.fx.bunt++; bunt(G, pos); return; }
+          if (!G.pull) {                                              // 방망이를 안 뺐으면 번트 시도로 쳐요
+            const pos = ballAt(bl, 1), d = Math.sqrt((pos.u - G.cu) ** 2 + (pos.v - G.cv) ** 2);
+            if (d < batR(G) * 1.35) { G.fx.px = pos.u; G.fx.py = pos.v; G.fx.bunt++; bunt(G, pos); return; }
+            buntMiss(G, d < batR(G) * 2.4, pos); return;              // 가까이 빗나가면 파울, 많이 빗나가면 헛번트 스트라이크
+          }
         }
       } else if (bin.hit && G.swing < 0) { G.swing = bl.f; G.fx.swing++; }
       // 방망이가 홈플레이트를 지나는 순간 맞았는지 확인
@@ -1449,6 +1462,7 @@ function aiInput(ai, G) {
   }
   if (G.bmode === 1 && G.phase === 'pitch') {                         // 번트: 공 쪽으로 방망이만 대기
     const end = ballAt(G.ball, 1); if (G.ball.f > lv.late) { const du = end.u - G.cu, dv = end.v - G.cv; if (Math.abs(du) > CUR_V) inp.x = Math.sign(du); if (Math.abs(dv) > CUR_V) inp.y = Math.sign(dv); }
+    if (G.ball.f > lv.late + 2 && !G.pull && ai.pullFor !== G.pitchN) { ai.pullFor = G.pitchN; if (!(Math.abs(end.u) <= 1.05 && Math.abs(end.v) <= 1.05) && Math.random() < (lv.sub ? 0.8 : 0.5)) inp.hit = true; }   // 존 밖 공은 방망이를 빼요
     return inp;
   }
   if (G.phase === 'select' || G.phase === 'aim') {                  // 기다리는 동안 가운데 근처로
@@ -1604,7 +1618,7 @@ function createRollback(match, me, send, sendSync) {
 function viewFromGame(G, a) {
   return {
     phase: G.phase, timer: G.timer, inning: G.inning, innings: G.innings, half: G.half, outs: G.outs, balls: G.balls, strikes: G.strikes,
-    bases: G.bases, def: G.def, hand: G.hand, phand: G.phand, assist: G.assist, bmode: G.bmode, lu: G.lu, bo: G.bo, src: G.src, bench: G.bench, used: G.used, sub: G.sub, tick: G.tick, hitR: G.hitR, win: G.win, score: G.score, hits: G.hits, line: G.line, ptype: G.ptype, tu: G.tu, tv: G.tv, cu: G.cu, cv: G.cv, ball: G.ball,
+    bases: G.bases, def: G.def, hand: G.hand, phand: G.phand, assist: G.assist, bmode: G.bmode, pull: G.pull, lu: G.lu, bo: G.bo, src: G.src, bench: G.bench, used: G.used, sub: G.sub, tick: G.tick, hitR: G.hitR, win: G.win, score: G.score, hits: G.hits, line: G.line, ptype: G.ptype, tu: G.tu, tv: G.tv, cu: G.cu, cv: G.cv, ball: G.ball,
     swing: G.swing, res: G.res, pitchN: G.pitchN, pst: G.pst, pj: G.pj, st: G.st, errs: G.errs, derby: G.derby, dleft: G.dleft, park: G.park, fence: G.fence, tb: G.tb, close: G.close, chal: G.chal, cat: G.cat, pos: G.pos, easy: G.easy, tut: G.tut, prp: G.prp, pfm: G.pfm, wx: G.wx, fly: G.fly, spray: G.spray, lhr: G.lhr, cold: G.cold, rd: G.rd, pc: G.pc, pclock: G.pclock, ibbq: G.ibbq, ct: G.ct, winner: G.winner, rate: G.rate, fx: G.fx, bat: batTeam(G), pit: pitTeam(G)
   };
 }
@@ -2453,7 +2467,7 @@ function drawDuel(v, now, part) {
     if (drop === 1 && k >= 1) outlined('세이프!', 420, 168, 12, '#69db7c', '#111');
     if (drop === 2 && dt2 > 0.9) outlined('아웃!', 420, 168, 12, '#ff8787', '#111');
   } else
-  drawCat(lefty ? 280 : 200, 268, 1.45, pSkin(bat, bsrc), bat, { bat: batA, bunt: v.bmode === 1, num: pNum(bat, bsrc, v.bo[bat]), face: lefty ? -1 : 1 });
+  drawCat(lefty ? 280 : 200, 268, 1.45, pSkin(bat, bsrc), bat, { bat: batA, bunt: v.bmode === 1 && !v.pull, num: pNum(bat, bsrc, v.bo[bat]), face: lefty ? -1 : 1 });
   }
   const bty = v.lu[bat][v.bo[bat]], bh = v.hand[bat][v.bo[bat]];
   // 지금 타자 (중계 화면 자막처럼) — 관중석 시점이면 왼쪽 위
@@ -2553,7 +2567,7 @@ function drawDuel(v, now, part) {
   else if (v.phase === 'select') msg = myTeam(pit) ? `⚾ ${Names[pit]}: ${touchUI() ? '◀ ▶' : mode === 'local' ? (pit === 0 ? 'A D' : '← →') : '← →'} 구종 · ${touchUI() ? '▲ ▼' : mode === 'local' ? (pit === 0 ? 'W S' : '↑ ↓') : '↑ ↓'} 수비 위치 → ${hk(pit)} 결정` : `${Names[pit]} 투수가 구종을 고르는 중…`;
   else if (v.phase === 'aim') msg = myTeam(pit) ? `🎯 ${Names[pit]} 투수: ${mv(pit)}로 코스 조준 → ${hk(pit)} 던지기` : `${Names[pit]} 투수가 조준하는 중…`;
   else if (v.phase === 'pitch' && myTeam(pit) && !myTeam(bat) && v.bases.some(x => x) && !v.easy) msg = `🧤 ${Names[pit]}: 공이 미트에 들어올 때 ${hk(pit)}! (블로킹 · 도루 저지)`;
-  else if (v.phase === 'pitch') msg = myTeam(bat) ? (v.bmode === 1 ? `🤏 번트: ${mv(bat)}로 노란 원을 공에 대기만 하면 돼요` : `🏏 ${Names[bat]} 타자: ${mv(bat)}로 노란 원을 공에 맞추고 ${hk(bat)} 스윙!`) : '';
+  else if (v.phase === 'pitch') msg = myTeam(bat) ? (v.bmode === 1 ? (v.pull ? '🤏 방망이를 뺐어요 (안 칠 공)' : `🤏 번트: ${mv(bat)}로 원을 공에 대요 · 안 칠 공은 ${hk(bat)}로 방망이 빼기`) : `🏏 ${Names[bat]} 타자: ${mv(bat)}로 노란 원을 공에 맞추고 ${hk(bat)} 스윙!`) : '';
   if (msg) outlined(msg, HALF, 292, 8.5, '#fff', '#111');
   if (mode === 'local' && !v.derby && !v.easy && (v.phase === 'select' || v.phase === 'aim')) outlined(`🏏 ${Names[bat]}: ${touchUI() ? '위쪽 카드 톡' : bat ? '숫자패드 1~7' : '숫자 1~7'} 작전 고르기 (지금: ${hideOn() && !peek ? '🤫' : BMODES[v.bmode]}) · ${mv(bat)} 노란 원 옮기기`, HALF, 280, 7.5, '#ffe066', '#111');
   if (mode === 'local' && !v.derby && !v.easy && v.phase === 'pitch' && v.bases.some(x => x)) outlined(`🧤 ${Names[pit]}: 공이 미트에 들어올 때 ${hk(pit)} (블로킹 · 도루 저지)`, HALF, 280, 7.5, '#a5d8ff', '#111');
@@ -2684,7 +2698,7 @@ function drawStand(v, now) {
   v.bases.forEach((on, i) => { if (on) { const p = BASE_P[i + 1], sc = v.src[bat][on - 1], lead = v.phase === 'pitch' && v.bmode >= 2 && bl && bl.f > 6 ? Math.min(1, bl.f / bl.t) * 0.5 : 0, p2 = BASE_P[i + 2] || BASE_P[4]; drawCat(p[0] + (p2[0] - p[0]) * lead, p[1] + (p2[1] - p[1]) * lead + 6, 0.55, pSkin(bat, sc), bat, { num: pNum(bat, sc, on - 1), run: lead ? now / 50 : 0 }); } });
   const bh = v.hand[bat][v.bo[bat]], lefty = bh === 2 ? v.phand[pit] === 0 : bh === 1, bsrc = v.src[bat][v.bo[bat]];
   let batA = 0; if (v.swing >= 0 && bl) batA = Math.min(1, Math.max(0, (bl.f - v.swing) / SWING_T));
-  drawCat(HOME[0] + (lefty ? 9 : -9), HOME[1] + 4, 0.6, pSkin(bat, bsrc), bat, { bat: batA, bunt: v.bmode === 1, num: pNum(bat, bsrc, v.bo[bat]), face: lefty ? -1 : 1 });
+  drawCat(HOME[0] + (lefty ? 9 : -9), HOME[1] + 4, 0.6, pSkin(bat, bsrc), bat, { bat: batA, bunt: v.bmode === 1 && !v.pull, num: pNum(bat, bsrc, v.bo[bat]), face: lefty ? -1 : 1 });
   // 공: 마운드 → 홈플레이트
   if (bl && (v.phase === 'pitch' || (v.phase === 'result' && v.res && !v.res.bases && !v.res.out))) {
     const s0 = Math.min(bl.f / bl.t, 1.25), M = fpos(0, 58), k = Math.min(1, s0), x = M[0] + (HOME[0] - M[0]) * k, y = M[1] + (HOME[1] + 6 - M[1]) * k + (s0 > 1 ? (s0 - 1) * 20 : 0), hg = Math.sin(k * Math.PI) * 5 + 6 * (1 - k);
