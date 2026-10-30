@@ -773,7 +773,7 @@ function newBatter(G) { G.balls = 0; G.strikes = 0; G.cu = 0; G.cv = 0; G.pko = 
 const pcFull = G => Math.round(G.rate * PCLOCK[G.bases.some(x => x) ? 1 : 0]);
 function nextPitch(G) {
   if (G.ptype >= NP || (G.prp && !pitchOpts(G).includes(G.ptype))) G.ptype = 0;
-  G.phase = 'select'; G.ball = null; G.swing = -1; G.swung = 0; G.tu = 0; G.tv = 0; G.lx = 0; G.ly = 0; G.res = null; G.bmode = 0; G.selT = 0; G.pq = 0; G.ibbq = 0;
+  G.phase = 'select'; G.ball = null; G.swing = -1; G.swung = 0; G.tu = 0; G.tv = 0; G.lx = 0; G.ly = 0; G.res = null; G.bmode = (G.bmode === 1 && G.balls + G.strikes > 0) ? 1 : 0; G.selT = 0; G.pq = 0; G.ibbq = 0;
   G.pc = G.pclock ? pcFull(G) : 0; G.ct = -1;
 }
 // 주자 진루: n루타 (4 = 홈런), walk = 볼넷(밀어내기만)
